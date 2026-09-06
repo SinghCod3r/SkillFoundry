@@ -29,6 +29,7 @@ jobs:
       - name: Publish to GitHub Packages
         env:
           TWINE_USERNAME: ${{ github.actor }}
-          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+          # Set GH_PACKAGES_TOKEN to a classic PAT with write:packages.
+          TWINE_PASSWORD: ${{ secrets.GH_PACKAGES_TOKEN }}
           TWINE_REPOSITORY_URL: https://pip.pkg.github.com/${{ github.repository_owner }}
         run: python -m twine upload dist/*
