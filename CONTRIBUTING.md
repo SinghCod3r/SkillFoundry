@@ -82,3 +82,80 @@ To help you navigate the codebase, here is a high-level overview of the core mod
 6. **Review:** A maintainer will review your code. Address any feedback promptly. Once approved, your PR will be merged!
 
 Thank you for helping make SkillFoundry better!
+
+## 🚀 Your First Contribution
+
+This quick path takes you from cloning SkillFoundry to opening your first pull request.
+
+### 1. Clone the repository
+
+Fork the repository on GitHub, then clone your fork:
+
+```bash
+git clone https://github.com/YOUR-USERNAME/SkillFoundry.git
+cd SkillFoundry
+```
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+On Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+### 3. Install the development dependencies
+
+```bash
+pip install -e ".[dev,all-providers]"
+```
+
+### 4. Run the tests
+
+```bash
+pytest
+```
+
+### 5. Run linting and type checking
+
+```bash
+ruff check src/ tests/
+pyright
+```
+
+### 6. Run SkillFoundry without a paid LLM API
+
+You can work on documentation, tests, validation, and other parts of the codebase that do not call an external LLM provider. Running the test suite and development checks above does not require a paid LLM API.
+
+### 7. Understand the source tree
+
+The main code lives in `src/skillfoundry/`, while automated tests live in `tests/`. See the Architecture Overview above for a breakdown of the core modules.
+
+### 8. Find a good first issue
+
+Look for open issues labelled `good first issue` or `help wanted`. Read the issue and existing discussion before starting work.
+
+### 9. Create a branch
+
+Create a descriptive branch from `main`:
+
+```bash
+git checkout -b docs/your-change
+```
+
+### 10. Commit and open your pull request
+
+After making and testing your changes:
+
+```bash
+git add .
+git commit -m "docs: describe your change"
+git push origin docs/your-change
+```
+Open your fork on GitHub and create a pull request against SkillFoundry's `main` branch. Explain what you changed and link the issue it addresses.
+
