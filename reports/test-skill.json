@@ -9,7 +9,7 @@
     "skill_hash": "",
     "task_set_hash": "",
     "config_hash": "",
-    "timestamp": "2026-09-06T06:41:02.457207Z"
+    "timestamp": "2026-09-06T06:42:57.334260Z"
   },
   "evaluation": {
     "version": "1",
@@ -19,8 +19,8 @@
     "config_hash": "",
     "runs": [
       {
-        "run_id": "f2251c7a",
-        "timestamp": "2026-09-06T06:41:02.454596Z",
+        "run_id": "bb4a9b68",
+        "timestamp": "2026-09-06T06:42:57.332223Z",
         "model": "default-model",
         "provider": "default-provider",
         "temperature": 0.0,
@@ -44,8 +44,8 @@
     ],
     "baseline_runs": [
       {
-        "run_id": "55d2f913",
-        "timestamp": "2026-09-06T06:41:02.454357Z",
+        "run_id": "9c3210c7",
+        "timestamp": "2026-09-06T06:42:57.331973Z",
         "model": "default-model",
         "provider": "default-provider",
         "temperature": 0.0,
@@ -64,7 +64,7 @@
           "single_run_warning": false
         },
         "errors": [],
-        "latency": 5.245208740234375e-06
+        "latency": 4.291534423828125e-06
       }
     ],
     "aggregate_score": {
