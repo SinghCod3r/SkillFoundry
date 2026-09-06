@@ -13,6 +13,7 @@ from skillfoundry.cli.compare import compare
 from skillfoundry.cli.eval_cmd import eval_cmd
 from skillfoundry.cli.improve import improve
 from skillfoundry.cli.output import Output
+from skillfoundry.cli.report import report
 from skillfoundry.cli.validate import validate
 from skillfoundry.config import load_config
 
@@ -64,3 +65,4 @@ cli.add_command(validate)
 cli.add_command(eval_cmd, name='eval')
 cli.add_command(improve)
 cli.add_command(compare)
+cli.add_command(report)
