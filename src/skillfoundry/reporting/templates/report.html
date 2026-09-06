@@ -4,288 +4,264 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillFoundry Report - {{ report.skill_name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg: #ffffff;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --accent: #2563EB;
-            --border: #e5e7eb;
-            --radius: 6px;
-            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-            
-            --score-green: #10b981;
-            --score-yellow: #f59e0b;
-            --score-red: #ef4444;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #111827;
-                --text: #f9fafb;
-                --text-light: #9ca3af;
-                --border: #374151;
-            }
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            margin: 0;
-            padding: 2rem;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        h1, h2, h3, h4 {
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .header-meta {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--bg);
-        }
-
-        .score-container {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-        }
-
-        .score-large {
-            font-size: 3rem;
-            font-weight: 700;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .score-card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .score-card .label {
-            font-size: 0.875rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .score-card .value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .score-green { color: var(--score-green); }
-        .score-yellow { color: var(--score-yellow); }
-        .score-red { color: var(--score-red); }
-
-        pre, code {
-            font-family: var(--font-mono);
-            font-size: 0.875em;
-            background: var(--border);
-            border-radius: 4px;
-            padding: 0.2em 0.4em;
-        }
-
-        pre {
-            padding: 1rem;
-            overflow-x: auto;
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            pre {
-                background: rgba(255, 255, 255, 0.05);
-            }
-        }
-
-        details {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-        }
-
-        summary {
-            padding: 1rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        details > div {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .task-success { border-left: 4px solid var(--score-green); }
-        .task-failure { border-left: 4px solid var(--score-red); }
-
-        .list-unstyled {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .list-unstyled li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .list-unstyled li:last-child {
-            border-bottom: none;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
-
-        @media print {
-            body {
-                color: black;
-                background: white;
-            }
-            .card {
-                break-inside: avoid;
-            }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        pre, code { font-family: 'JetBrains Mono', monospace; }
+        
+        pre::-webkit-scrollbar { height: 8px; }
+        pre::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1>SkillFoundry Report: {{ report.skill_name }}</h1>
-        <div class="header-meta">
-            <span>Source: {{ report.source_path }}</span>
-            <span>Date: {{ report.metadata.timestamp }}</span>
-            <span>Version: {{ report.metadata.version }}</span>
-        </div>
-    </div>
-
-    {% if report.evaluation %}
-    <div class="card">
-        <h2>Overall Score</h2>
-        <div class="score-container">
-            {% set s = report.evaluation.aggregate_score.overall %}
-            <span class="score-large {% if s >= 80 %}score-green{% elif s >= 60 %}score-yellow{% else %}score-red{% endif %}">
-                {{ "%.1f"|format(s) }}
-            </span>
-            <span>/ 100</span>
-        </div>
-    </div>
-
-    <h3>Dimensions</h3>
-    <div class="grid">
-        {% for dim in report.evaluation.aggregate_score.dimensions %}
-        <div class="score-card">
-            <div class="label">{{ dim.name }}</div>
-            <div class="value {% if dim.score >= 80 %}score-green{% elif dim.score >= 60 %}score-yellow{% else %}score-red{% endif %}">
-                {{ "%.1f"|format(dim.score) }}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-
-    {% if report.evaluation.task_results %}
-    <h3>Task Results</h3>
-    <div>
-        {% for task in report.evaluation.task_results %}
-        <details class="{% if task.success %}task-success{% else %}task-failure{% endif %}">
-            <summary>{{ task.task.name }} - {% if task.success %}Pass{% else %}Fail{% endif %}</summary>
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        
+        <header class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4">
             <div>
-                <p><strong>Description:</strong> {{ task.task.description }}</p>
-                {% if task.output %}
-                <p><strong>Output:</strong></p>
-                <pre>{{ task.output }}</pre>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        {{ report.skill_name[:1].upper() if report.skill_name else 'S' }}
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ report.skill_name or 'Unnamed Skill' }}</h1>
+                </div>
+                <div class="text-sm text-gray-500 font-medium ml-[3.25rem]">
+                    Report &middot; {{ report.metadata.timestamp[:10] if report.metadata.timestamp is string else report.metadata.timestamp.strftime('%Y-%m-%d') }}
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-2 text-xs">
+                {% if report.source_path %}
+                <span class="inline-flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full text-gray-600 border border-gray-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    {{ report.source_path }}
+                </span>
                 {% endif %}
-                {% if task.error %}
-                <p><strong>Error:</strong></p>
-                <pre>{{ task.error }}</pre>
+                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                    v{{ report.metadata.skillfoundry_version|default('1.0') }}
+                </span>
+            </div>
+        </header>
+
+        {% if report.evaluation %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center relative overflow-hidden">
+                <h2 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-4">Overall Score</h2>
+                
+                {% set s = report.evaluation.aggregate_score.overall %}
+                {% if s >= 80 %}
+                    {% set score_color = "text-emerald-500" %}
+                    {% set score_bg = "bg-emerald-50" %}
+                    {% set score_ring = "ring-emerald-100" %}
+                {% elif s >= 60 %}
+                    {% set score_color = "text-amber-500" %}
+                    {% set score_bg = "bg-amber-50" %}
+                    {% set score_ring = "ring-amber-100" %}
+                {% else %}
+                    {% set score_color = "text-red-500" %}
+                    {% set score_bg = "bg-red-50" %}
+                    {% set score_ring = "ring-red-100" %}
+                {% endif %}
+                
+                <div class="w-32 h-32 rounded-full {{ score_bg }} flex items-center justify-center ring-8 {{ score_ring }} mb-2">
+                    <span class="text-4xl font-bold {{ score_color }}">{{ "%.1f"|format(s) }}</span>
+                </div>
+                <div class="text-sm font-medium text-gray-400 mt-2">out of 100</div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 class="text-gray-800 text-lg font-bold mb-5 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Dimensions
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for dim in report.evaluation.aggregate_score.dimensions %}
+                        {% set dim_s = dim.score * 100 if dim.score <= 1.0 else dim.score %}
+                        {% if dim_s >= 80 %}
+                            {% set dim_color = "text-emerald-600" %}
+                            {% set dim_border = "border-emerald-200" %}
+                            {% set dim_bg = "bg-emerald-50" %}
+                        {% elif dim_s >= 60 %}
+                            {% set dim_color = "text-amber-600" %}
+                            {% set dim_border = "border-amber-200" %}
+                            {% set dim_bg = "bg-amber-50" %}
+                        {% else %}
+                            {% set dim_color = "text-red-600" %}
+                            {% set dim_border = "border-red-200" %}
+                            {% set dim_bg = "bg-red-50" %}
+                        {% endif %}
+                        
+                        <div class="rounded-lg border {{ dim_border }} {{ dim_bg }} p-4 transition-transform hover:-translate-y-1 duration-200">
+                            <div class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1 truncate" title="{{ dim.name }}">{{ dim.name }}</div>
+                            <div class="text-2xl font-bold {{ dim_color }}">{{ "%.1f"|format(dim_s) }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                
+                {% if report.evaluation and report.evaluation.runs %}
+                {% set main_run = report.evaluation.runs[0] %}
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        Task Results
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        {% for task in main_run.task_results %}
+                        <details class="group bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden [&_summary::-webkit-details-marker]:hidden">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    {% if task.passed %}
+                                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </div>
+                                    {% else %}
+                                        <div class="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </div>
+                                    {% endif %}
+                                    <span class="font-medium text-gray-900 truncate font-mono text-sm">{{ task.task_id }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full {% if task.passed %}bg-emerald-100 text-emerald-700{% else %}bg-red-100 text-red-700{% endif %}">
+                                        {% if task.passed %}Pass{% else %}Fail{% endif %}
+                                    </span>
+                                    <svg class="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                            </summary>
+                            <div class="p-4 pt-0 border-t border-gray-100 text-sm">
+                                
+                                {% if task.response %}
+                                <div class="mt-4 mb-3">
+                                    <strong class="block text-gray-900 mb-2">Response:</strong>
+                                    <pre class="bg-gray-50 text-gray-800 p-3 rounded-lg border border-gray-200 overflow-x-auto text-xs whitespace-pre-wrap">{{ task.response }}</pre>
+                                </div>
+                                {% endif %}
+                                
+                                {% if task.errors %}
+                                <div>
+                                    <strong class="block text-red-600 mb-2">Errors:</strong>
+                                    <pre class="bg-red-50 text-red-800 p-3 rounded-lg border border-red-100 overflow-x-auto text-xs whitespace-pre-wrap">{{ task.errors | join('\n') }}</pre>
+                                </div>
+                                {% endif %}
+
+                                {% if task.judge_reasoning %}
+                                <div class="mt-3">
+                                    <strong class="block text-gray-900 mb-2">Judge Reasoning:</strong>
+                                    <div class="bg-blue-50 text-blue-800 p-3 rounded-lg border border-blue-100 text-xs">{{ task.judge_reasoning }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </section>
                 {% endif %}
             </div>
-        </details>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endif %}
 
-    {% if report.comparison %}
-    <h3>Comparison</h3>
-    <div class="card">
-        <p><strong>Baseline Score:</strong> {{ "%.1f"|format(report.comparison.baseline_score) }}</p>
-        <p><strong>Improvement:</strong> {{ "%.1f"|format(report.comparison.improvement) }}</p>
-    </div>
-    {% endif %}
+            <div class="space-y-6">
+                
+                {% if report.comparison %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Comparison
+                    </h3>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-gray-500 text-sm">Baseline Score</span>
+                        <span class="font-medium">{{ "%.1f"|format(report.comparison.baseline.aggregate_score.overall) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 text-sm">Improvement</span>
+                        <span class="font-bold {% if report.comparison.improvement_points > 0 %}text-emerald-600{% elif report.comparison.improvement_points < 0 %}text-red-600{% else %}text-gray-600{% endif %}">
+                            {% if report.comparison.improvement_points > 0 %}+{% endif %}{{ "%.1f"|format(report.comparison.improvement_points) }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
 
-    {% if report.warnings %}
-    <h3>Warnings</h3>
-    <div class="card" style="border-left: 4px solid var(--score-yellow);">
-        <ul style="margin: 0; padding-left: 1.5rem;">
-            {% for warning in report.warnings %}
-            <li>{{ warning }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+                {% if report.warnings %}
+                <div class="bg-amber-50 rounded-xl shadow-sm border border-amber-200 p-5">
+                    <h3 class="text-sm font-bold text-amber-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Warnings
+                    </h3>
+                    <ul class="space-y-2 text-sm text-amber-700">
+                        {% for warning in report.warnings %}
+                        <li class="flex items-start gap-2">
+                            <span class="text-amber-500 mt-0.5">•</span>
+                            <span>{{ warning }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
-    {% if report.recommendations %}
-    <h3>Recommendations</h3>
-    <div class="card">
-        <ul style="margin: 0; padding-left: 1.5rem;">
-            {% for rec in report.recommendations %}
-            <li>{{ rec }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+                {% if report.recommendations %}
+                <div class="bg-blue-50 rounded-xl shadow-sm border border-blue-200 p-5">
+                    <h3 class="text-sm font-bold text-blue-800 uppercase tracking-wider mb-3 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Recommendations
+                    </h3>
+                    <ul class="space-y-2 text-sm text-blue-700">
+                        {% for rec in report.recommendations %}
+                        <li class="flex items-start gap-2">
+                            <span class="text-blue-500 mt-0.5">•</span>
+                            <span>{{ rec }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
-    {% if report.generated_files %}
-    <h3>Generated Files</h3>
-    <div class="card">
-        <ul class="list-unstyled" style="margin: 0;">
-            {% for file in report.generated_files %}
-            <li><code>{{ file }}</code></li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+                {% if report.generated_files %}
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Generated Files
+                    </h3>
+                    <ul class="space-y-2 text-sm">
+                        {% for file in report.generated_files %}
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <code class="text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded truncate" title="{{ file }}">{{ file }}</code>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
 
-    <h3>Metadata</h3>
-    <div class="card">
-        <ul class="list-unstyled" style="margin: 0;">
-            <li><strong>Model:</strong> {{ report.metadata.model_name }}</li>
-                        <li><strong>System Hash:</strong> <code>{{ report.metadata.system_hash }}</code></li>
-            <li><strong>Environment:</strong> {{ report.metadata.environment }}</li>
-        </ul>
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        System Metadata
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Provider & Model</span>
+                            <span class="font-medium text-gray-800">{{ report.metadata.model_provider|default('N/A') }} / {{ report.metadata.model_identifier|default('N/A') }}</span>
+                        </div>
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Skill Hash</span>
+                            <code class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded break-all">{{ report.metadata.skill_hash|default('N/A') }}</code>
+                        </div>
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Task Set Hash</span>
+                            <code class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded break-all">{{ report.metadata.task_set_hash|default('N/A') }}</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
