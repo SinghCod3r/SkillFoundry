@@ -1,59 +1,84 @@
 # Contributing to SkillFoundry
 
-First off, thank you for considering contributing to SkillFoundry! We welcome issues, bug reports, feature requests, and pull requests.
+First off, thank you for considering contributing to SkillFoundry! We are building the definitive framework for AI Agent Skills, and community contributions are essential to making it robust, scalable, and secure.
 
-## Prerequisites
+This document provides guidelines and instructions for contributing.
 
-- Python 3.11+
-- git
+## 📝 Code of Conduct
 
-## Development Setup
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please report any unacceptable behavior to the maintainers.
 
-1. Fork and clone the repository
-2. Install the package in editable mode with development dependencies:
+## 🛠️ Development Environment Setup
+
+We use modern Python tooling to ensure code quality and a smooth developer experience.
+
+### Prerequisites
+
+- Python 3.11 or higher
+- Git
+
+### Installation
+
+1. **Fork and clone the repository:**
    ```bash
+   git clone https://github.com/YOUR_USERNAME/SkillFoundry.git
+   cd SkillFoundry
+   ```
+
+2. **Install in editable mode with development dependencies:**
+   We recommend using a virtual environment (e.g., `venv` or `conda`).
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -e ".[dev,all-providers]"
    ```
-3. Run tests to ensure everything is set up correctly:
+
+3. **Set up pre-commit hooks:**
+   We use `pre-commit` to ensure code formatting and linting rules are applied before every commit.
    ```bash
-   pytest
+   pre-commit install
    ```
 
-## Code Style
+## 📏 Code Standards
 
-SkillFoundry strictly enforces code quality and style standards:
-- **Linting & Formatting:** We use `ruff`. Run `ruff check src/ tests/` and `ruff format src/ tests/`.
-- **Type Hints:** We use `pyright` for static type checking. All Python files must use type hints and `from __future__ import annotations`.
-- Please ensure you configure `pre-commit` hooks for automatic checking before commits.
+SkillFoundry maintains high standards for code quality to ensure reliability in production environments:
 
-## Testing
+- **Formatting & Linting:** We use `ruff` for all linting and formatting. 
+  - Format: `ruff format src/ tests/`
+  - Lint: `ruff check src/ tests/`
+- **Type Checking:** Strict type hints are mandatory. We use `pyright`. Run `pyright` to verify types.
+- **Imports:** Always use `from __future__ import annotations` at the top of Python files.
 
-All new features and bug fixes should include tests.
-- We use `pytest` as our testing framework.
-- Make use of appropriate fixtures when writing tests.
-- Include security tests where applicable (e.g., verifying secret redaction or path traversal prevention).
+## 🧪 Testing
 
-## Pull Request Process
+All new features and bug fixes must include comprehensive tests.
 
-1. Create a descriptive branch for your work.
-2. Commit your changes.
-3. Push to your fork and submit a PR against the `main` branch.
-4. Ensure your PR description explains what changes you are making and why.
-5. All CI checks (tests, lints, type checks) must pass before a PR can be merged.
+- **Framework:** We use `pytest`.
+- **Running Tests:**
+  ```bash
+  pytest
+  ```
+- **Coverage:** Aim for at least 90% test coverage for new modules. Run `pytest --cov=src` to check coverage.
+- **Security Tests:** If you are touching security-sensitive code (like path resolution or command execution), include specific tests to verify boundary enforcement (e.g., path traversal prevention).
 
-## Architecture Overview
+## 🏗️ Architecture Overview
 
-SkillFoundry is organized into these core modules:
-- `cli/`: Handles command-line arguments and configuration loading.
-- `analysis/`: Analyzes the target codebase or documentation.
-- `providers/`: Interface with external LLM APIs (OpenAI, Anthropic, Google).
-- `skills/`: Generating and validating Agent Skills.
-- `evaluation/`: Orchestrates the evaluation runs and baseline comparisons.
-- `reporting/`: Generates human-readable output (JSON, HTML).
+To help you navigate the codebase, here is a high-level overview of the core modules in `src/skillfoundry/`:
 
-## Where to Start
+- `cli/`: Command-line interface definitions and configuration loading.
+- `analysis/`: Parsers and static analyzers for target codebases.
+- `providers/`: Abstraction layers for interacting with external LLM APIs.
+- `skills/`: Logic for generating, formatting, and validating Agent Skills.
+- `evaluation/`: The core benchmarking engine that orchestrates baseline vs. enhanced runs.
+- `reporting/`: Generators for JSON, HTML, and terminal-based evaluation reports.
 
-If you're looking for ways to contribute, check our issue tracker for:
-- "good first issue" tags.
-- Missing test coverage.
-- Enhancements to the prompt templates or evaluation workflows.
+## 🔄 Pull Request Process
+
+1. **Find an Issue:** Look for issues tagged `good first issue` or `help wanted`. If you want to build a new feature, please open an issue to discuss it first.
+2. **Branch Out:** Create a descriptive branch from `main` (e.g., `feature/add-azure-provider` or `bugfix/fix-path-resolution`).
+3. **Write Code & Tests:** Implement your changes and ensure all tests pass.
+4. **Commit:** Write clear, concise commit messages. Your commits will be checked by pre-commit hooks.
+5. **Submit PR:** Open a Pull Request against the `main` branch. Fill out the PR template thoroughly.
+6. **Review:** A maintainer will review your code. Address any feedback promptly. Once approved, your PR will be merged!
+
+Thank you for helping make SkillFoundry better!
