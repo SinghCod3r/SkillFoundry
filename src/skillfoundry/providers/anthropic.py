@@ -97,4 +97,3 @@ class AnthropicProvider:
         raise ValueError("Failed to generate structured output after retries.")
 
 # Check compatibility
-_: ModelProvider = AnthropicProvider()

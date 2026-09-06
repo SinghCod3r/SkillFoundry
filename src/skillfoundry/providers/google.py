@@ -101,4 +101,3 @@ class GoogleProvider:
         raise ValueError("Failed to generate structured output after retries.")
 
 # Check compatibility
-_: ModelProvider = GoogleProvider()
