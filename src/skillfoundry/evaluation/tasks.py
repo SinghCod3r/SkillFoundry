@@ -38,16 +38,15 @@ class TaskGenerator:
         user_prompt = (
             f"Project Name: {analysis.project_metadata.name}\n"
             f"Skill Name: {skill.metadata.name}\n"
-            f"Skill Claims: {[claim.description for claim in skill.metadata.claims]}\n"
+            f"Skill Claims: {[claim.claim for claim in skill.claims]}\n"
         )
 
         req = GenerateRequest(
-            prompt=user_prompt,
+            user_prompt=user_prompt,
             system_prompt=system_prompt,
             temperature=self.settings.evaluation.temperature,
-            schema=TaskList.model_json_schema()
         )
-        response_text = self.provider.generate(req)
+        response_text = self.provider.generate(req).content
 
         try:
             data = json.loads(response_text)

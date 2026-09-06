@@ -17,6 +17,7 @@ from skillfoundry.cli.output import Output
 @click.option("--provider", type=str, default=None, help="LLM provider name.")
 @click.option("--model", type=str, default=None, help="LLM model identifier.")
 @click.option("--accept", is_flag=True, help="Auto-accept improvement if score improves and no safety regression.")
+@click.option("--allow-safety-regression", is_flag=True, help="Explicitly allow a safety regression.")
 @click.pass_context
 def improve(
     ctx: click.Context,
@@ -24,10 +25,12 @@ def improve(
     provider: str | None,
     model: str | None,
     accept: bool,
+    allow_safety_regression: bool,
 ) -> None:
     """Improve a skill using evaluation failures as evidence."""
     from skillfoundry.config import load_config
     from skillfoundry.evaluation import EvaluationEngine, TaskGenerator
+    from skillfoundry.evaluation.comparison import compare_results
     from skillfoundry.improvement import SkillImprover
     from skillfoundry.providers import get_provider
     from skillfoundry.skills.writer import SkillWriter
@@ -95,6 +98,12 @@ def improve(
     # Compare results
     output.step(5, 6, "Comparing results")
 
+    comparison = compare_results(
+        old_eval_result,
+        new_eval_result,
+        allow_safety_regression=allow_safety_regression,
+    )
+
     old_score = old_eval_result.aggregate_score.overall
     new_score = new_eval_result.aggregate_score.overall
 
@@ -118,9 +127,9 @@ def improve(
     rejected = False
     reject_reason = ""
 
-    if new_safety < old_safety:
+    if any(w.severity == "critical" for w in comparison.warnings) and not allow_safety_regression:
         rejected = True
-        reject_reason = "Safety regressed."
+        reject_reason = "Safety regressed. Use --allow-safety-regression to override explicitly."
     elif new_score <= old_score:
         rejected = True
         reject_reason = "Overall score did not improve."

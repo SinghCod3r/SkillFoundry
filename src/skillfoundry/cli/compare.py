@@ -53,7 +53,7 @@ def compare(ctx: click.Context, baseline_path: str, skill_path: str) -> None:
     output.newline()
     output.result("Baseline", str(baseline.aggregate_score.overall))
     output.result("With Skill", str(with_skill.aggregate_score.overall))
-    output.result("Improvement", f"{comparison.improvement_points:+d} points")
+    output.result("Improvement", f"{comparison.improvement_points:+.2f} points")
     output.newline()
 
     # Dimension breakdown

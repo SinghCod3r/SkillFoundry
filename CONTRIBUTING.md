@@ -21,7 +21,7 @@ We use modern Python tooling to ensure code quality and a smooth developer exper
 
 1. **Fork and clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/SkillFoundry.git
+   git clone https://github.com/SinghCod3r/SkillFoundry.git
    cd SkillFoundry
    ```
 

@@ -31,6 +31,8 @@ class Judge(Protocol):
 
 
 class ExactMatchJudge:
+    measured_dimensions = ("correctness",)
+
     def evaluate(self, task: EvaluationTask, response: str) -> TaskResult:
         success = response.strip() == (task.expected_output or "").strip()
         score = 1.0 if success else 0.0
@@ -38,12 +40,15 @@ class ExactMatchJudge:
             task_id=task.id,
             passed=success,
             scores={"correctness": score},
+            measured_dimensions=list(self.measured_dimensions),
             judge_reasoning="Exact match" if success else "No match",
             label="exact-match"
         )
 
 
 class ContainsJudge:
+    measured_dimensions = ("correctness",)
+
     def evaluate(self, task: EvaluationTask, response: str) -> TaskResult:
         success = (task.expected_output or "").strip() in response
         score = 1.0 if success else 0.0
@@ -51,12 +56,15 @@ class ContainsJudge:
             task_id=task.id,
             passed=success,
             scores={"correctness": score},
+            measured_dimensions=list(self.measured_dimensions),
             judge_reasoning="Contains match" if success else "Does not contain",
             label="contains-match"
         )
 
 
 class RegexJudge:
+    measured_dimensions = ("correctness",)
+
     def evaluate(self, task: EvaluationTask, response: str) -> TaskResult:
         pattern = task.expected_output or ""
         success = bool(re.search(pattern, response))
@@ -65,12 +73,21 @@ class RegexJudge:
             task_id=task.id,
             passed=success,
             scores={"correctness": score},
+            measured_dimensions=list(self.measured_dimensions),
             judge_reasoning="Regex match" if success else "No regex match",
             label="regex-match"
         )
 
 
 class LLMJudge:
+    measured_dimensions = (
+        "correctness",
+        "task_success",
+        "instruction_following",
+        "safety",
+        "efficiency",
+    )
+
     def __init__(self, provider: ModelProvider):
         self.provider = provider
 
@@ -91,7 +108,6 @@ class LLMJudge:
         req = GenerateRequest(
             user_prompt=user_prompt,
             system_prompt=system_prompt,
-            schema=JudgeOutput.model_json_schema()
         )
         out_text = self.provider.generate(req).content
         try:
@@ -119,6 +135,7 @@ class LLMJudge:
             task_id=task.id,
             passed=passed,
             scores=scores,
+            measured_dimensions=list(scores),
             judge_reasoning=output.reasoning,
             label="model-judged"
         )
@@ -126,6 +143,8 @@ class LLMJudge:
 
 
 class PythonASTJudge:
+    measured_dimensions = ("correctness",)
+
     def evaluate(self, task: EvaluationTask, response: str) -> TaskResult:
         import re
         match = re.search(r"```python\s+(.*?)\s+```", response, re.DOTALL)
@@ -147,6 +166,7 @@ class PythonASTJudge:
             task_id=task.id,
             passed=passed,
             scores={"correctness": score},
+            measured_dimensions=list(self.measured_dimensions),
             judge_reasoning=reason,
             label="python-ast"
         )

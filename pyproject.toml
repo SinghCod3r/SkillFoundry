@@ -45,9 +45,9 @@ skillfoundry = "skillfoundry.cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/SinghCod3r/SkillFoundry"
-Documentation = "https://github.com/skillfoundry/skillfoundry#readme"
+Documentation = "https://github.com/SinghCod3r/SkillFoundry#readme"
 Repository = "https://github.com/SinghCod3r/SkillFoundry"
-Issues = "https://github.com/skillfoundry/skillfoundry/issues"
+Issues = "https://github.com/SinghCod3r/SkillFoundry/issues"
 "Bug Tracker" = "https://github.com/SinghCod3r/SkillFoundry/issues"
 
 [tool.ruff]

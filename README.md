@@ -22,39 +22,58 @@ By treating AI skills as software artifacts that require testing, validation, an
 - **🧠 Automated Skill Generation:** Convert any local directory or GitHub repository into a standardized Agent Skill.
 - **📊 Rigorous Evaluation Engine:** Automatically generate evaluation tasks to benchmark your skill against baseline agent performance.
 - **📈 Data-Driven Improvement:** Utilize evaluation failures to autonomously refine and improve the generated skill.
-- **🛡️ Enterprise-Grade Security:** Built-in secret redaction, SSRF protection, and sandboxed evaluation execution.
+- **🛡️ Security Controls:** Built-in secret redaction, SSRF protection, and a constrained process runner. The runner is not a security sandbox.
 - **🔌 Multi-Provider Support:** Seamless integration with leading LLM providers (OpenAI, Anthropic, Google).
 
 ## 🚀 Quick Start
 
-### Installation
+### Install From PyPI
 
-Install SkillFoundry using `pip`. We recommend installing it with your preferred LLM provider:
+Use this path when you only want to use SkillFoundry:
 
 ```bash
-# Install with OpenAI support
-pip install "skillfoundry[openai]"
-
-# Or install all providers
-pip install "skillfoundry[all-providers]"
+python3 -m pip install "skillfoundry[openai]"
+export OPENAI_API_KEY="your-api-key"
+skillfoundry --help
 ```
 
-### Build Your First Skill
+Replace `openai` with `anthropic`, `google`, or `all-providers` when needed.
 
-1. **Set your API credentials:**
-   ```bash
-   export OPENAI_API_KEY="sk-..."
-   ```
+### Clone And Use The Repository
 
-2. **Run the build command** against a local project:
-   ```bash
-   skillfoundry build ./my-project
-   ```
+Use this copy-paste setup when you want to run the current source checkout:
 
-3. **Evaluate the generated skill:**
-   ```bash
-   skillfoundry eval ./my-project-skill
-   ```
+```bash
+git clone https://github.com/SinghCod3r/SkillFoundry.git
+cd SkillFoundry
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[openai]"
+export OPENAI_API_KEY="your-api-key"
+```
+
+Build and evaluate a skill from a local project:
+
+```bash
+skillfoundry build /path/to/your-project --output-dir ./dist
+skillfoundry validate ./dist/your-project
+skillfoundry eval ./dist/your-project --runs 1
+```
+
+Use `skillfoundry build --help` and `skillfoundry eval --help` for all options.
+
+### Developer Setup
+
+Install the checkout with development tools and an LLM provider:
+
+```bash
+python -m pip install -e ".[dev,openai]"
+pytest
+ruff check .
+pyright
+```
+
+For a different provider, replace `openai` in the install command and set its API key environment variable.
 
 ## 📖 How It Works
 
@@ -63,7 +82,7 @@ SkillFoundry implements a closed-loop system for skill development:
 1. **Analysis:** Deep parsing of the target codebase (files, APIs, CLI commands, documentation).
 2. **Generation:** Constructing an Agent Skill definition optimized for LLM consumption.
 3. **Benchmarking:** Running a baseline agent (without the skill) vs. an enhanced agent (with the skill) across generated tasks.
-4. **Scoring:** Utilizing a weighted model (Correctness 30%, Success 25%, Safety 20%, Instruction Following 15%, Efficiency 10%) to prove the skill's utility.
+4. **Scoring:** Utilizing applicable weighted dimensions (Correctness 30%, Success 25%, Safety 20%, Instruction Following 15%, Efficiency 10%). Deterministic judges report only the dimensions they measure; missing dimensions do not silently receive scores.
 5. **Iteration:** Automatically fixing skill definitions based on evaluation failures.
 
 ## 💻 Command Reference

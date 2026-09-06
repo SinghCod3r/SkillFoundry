@@ -25,10 +25,11 @@ class BaselineAgent:
 
     def execute(self, task: EvaluationTask) -> str:
         req = GenerateRequest(
-            prompt=task.prompt,
+            system_prompt="",
+            user_prompt=task.prompt,
             temperature=self.settings.evaluation.temperature,
         )
-        return self.model_provider.generate(req).text
+        return self.model_provider.generate(req).content
 
 
 class SkillEnabledAgent:
@@ -44,8 +45,8 @@ class SkillEnabledAgent:
         self.model_provider = model_provider
         self.settings = settings
         self.skill_content = skill_content
-        if skill and skill.content:
-            self.skill_content = skill.content
+        if skill and skill.skill_md_body:
+            self.skill_content = skill.skill_md_body
 
     def execute(self, task: EvaluationTask) -> str:
         prompt = task.prompt
@@ -53,7 +54,8 @@ class SkillEnabledAgent:
             prompt = f"Background Skill Information:\n{self.skill_content}\n\nTask:\n{prompt}"
 
         req = GenerateRequest(
-            prompt=prompt,
+            system_prompt="",
+            user_prompt=prompt,
             temperature=self.settings.evaluation.temperature,
         )
-        return self.model_provider.generate(req).text
+        return self.model_provider.generate(req).content

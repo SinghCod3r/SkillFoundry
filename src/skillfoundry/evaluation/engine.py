@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 import uuid
+from datetime import UTC, datetime
 from pathlib import Path
 
 from skillfoundry.config import Settings
@@ -64,7 +65,7 @@ class EvaluationEngine:
             score=score,
             task_results=results,
             latency=latency,
-            timestamp=start_time,
+            timestamp=datetime.fromtimestamp(start_time, tz=UTC),
             model="default-model",
             provider="default-provider"
         )

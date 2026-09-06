@@ -38,8 +38,11 @@ def validate_command(command: list[str]) -> list[str]:
     return command
 
 def create_temp_workspace() -> Path:
-    """Create isolated temp directory for execution."""
-    return Path(tempfile.mkdtemp(prefix="skillfoundry_sandbox_"))
+    """Create a temporary workspace for process execution.
+
+    This is temporary-directory management, not a security sandbox or isolation boundary.
+    """
+    return Path(tempfile.mkdtemp(prefix="skillfoundry_process_"))
 
 def cleanup_workspace(path: Path) -> None:
     """Safely remove temp workspace."""
@@ -47,7 +50,10 @@ def cleanup_workspace(path: Path) -> None:
         shutil.rmtree(path, ignore_errors=True)
 
 def run_process(command: list[str], config: ProcessConfig) -> ProcessResult:
-    """Run a command as subprocess with timeout, output capture, and resource limits."""
+    """Run a command with timeout, output capture, and basic resource limits.
+
+    This process runner does not provide OS-level sandboxing or isolation.
+    """
     validate_command(command)
 
     start_time = time.time()

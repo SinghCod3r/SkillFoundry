@@ -19,9 +19,9 @@ class SkillMetadata(BaseModel):
     name: str = Field(..., min_length=1, max_length=SKILL_NAME_MAX_LENGTH)
     description: str = Field(..., min_length=1, max_length=SKILL_DESCRIPTION_MAX_LENGTH)
     license: str | None = None
-    compatibility: str | None = Field(None, max_length=500)
+    compatibility: str | None = Field(default=None, max_length=500)
     metadata: dict[str, str] | None = None
-    allowed_tools: str | None = Field(None, alias="allowed-tools")
+    allowed_tools: str | None = Field(default=None, alias="allowed-tools")
 
     model_config = {"populate_by_name": True}
 

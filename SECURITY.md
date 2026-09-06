@@ -20,7 +20,7 @@ SkillFoundry implements defense-in-depth to mitigate the threats outlined above:
 - **Secret Redaction Pipeline:** Before any repository data or context is sent to a model provider (OpenAI, Anthropic, Google), it passes through a regex-based and entropy-based secret redaction engine to prevent API key leakage.
 - **Path Traversal Prevention:** All file system operations are strictly jailed to the target workspace directory using secure path resolution mechanisms.
 - **SSRF Protection:** External network requests made during documentation analysis enforce strict timeouts and deny-list local/private IP ranges to prevent Server-Side Request Forgery.
-- **Sandboxed Evaluation (V0.1):** The evaluation engine runs subprocesses with dropped privileges where possible. Execution is strictly limited to isolated test runners, not the raw source code.
+- **Process-runner evaluation (V0.1):** The evaluation engine runs subprocesses with timeouts, output limits, and command checks. This is not a security sandbox and must not be treated as OS-level isolation.
 
 ## 🐛 Reporting a Vulnerability
 

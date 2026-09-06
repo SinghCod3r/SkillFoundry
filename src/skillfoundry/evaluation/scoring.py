@@ -52,6 +52,8 @@ def calculate_score(results: list[TaskResult], weights: ScoringWeights) -> Score
             dim_counts[dim_name] = dim_counts.get(dim_name, 0) + 1
 
             w = weights_dict.get(dim_name, 0.0)
+            if w <= 0:
+                continue
             task_weighted_sum += score_val * w
             task_weight_total += w
 
@@ -119,7 +121,19 @@ def aggregate_runs(runs: list[EvaluationRun]) -> tuple[Score, dict[str, float], 
         mean_val = sum(vals) / len(vals)
         mean_scores[dim] = mean_val
         score_ranges[dim] = (min(vals), max(vals))
-        dimensions.append(DimensionScore(name=dim, score=mean_val))
+        weights = [
+            run_dim.weight
+            for run in runs
+            for run_dim in run.score.dimensions
+            if run_dim.name == dim
+        ]
+        dimensions.append(
+            DimensionScore(
+                name=dim,
+                score=mean_val,
+                weight=statistics.mean(weights) if weights else 0.0,
+            )
+        )
 
     mean_val = 0.0
     min_val = 0.0

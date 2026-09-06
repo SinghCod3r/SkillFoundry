@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class EvaluationType(str, Enum):
+class EvaluationType(StrEnum):
     """Type of evaluation judge."""
 
     EXACT_MATCH = "exact_match"
@@ -48,6 +48,7 @@ class TaskResult(BaseModel):
     token_usage: dict[str, int] = Field(default_factory=dict)
     judge_reasoning: str = ""
     label: str = ""  # "observed", "model-judged", "deterministic"
+    measured_dimensions: list[str] = Field(default_factory=list)
 
 
 class ScoringWeights(BaseModel):
@@ -125,7 +126,7 @@ class EvaluationRun(BaseModel):
     provider: str = ""
     temperature: float = 0.0
     task_results: list[TaskResult] = Field(default_factory=list)
-    score: Score = Field(default_factory=Score)
+    score: Score = Field(default_factory=lambda: Score(overall=0.0))
     errors: list[str] = Field(default_factory=list)
     latency: float = 0.0
 
@@ -140,7 +141,7 @@ class EvaluationResult(BaseModel):
     config_hash: str = ""
     runs: list[EvaluationRun] = Field(default_factory=list)
     baseline_runs: list[EvaluationRun] = Field(default_factory=list)
-    aggregate_score: Score = Field(default_factory=Score)
+    aggregate_score: Score = Field(default_factory=lambda: Score(overall=0.0))
     baseline_score: Score | None = None
     mean_scores: dict[str, float] = Field(default_factory=dict)
     score_range: dict[str, tuple[float, float]] = Field(default_factory=dict)
@@ -165,7 +166,7 @@ class ComparisonResult(BaseModel):
 
     baseline: EvaluationResult
     with_skill: EvaluationResult
-    improvement_points: int = 0
+    improvement_points: float = 0.0
     dimension_changes: dict[str, float] = Field(default_factory=dict)
     warnings: list[ImprovementWarning] = Field(default_factory=list)
     recommendation: str = ""
