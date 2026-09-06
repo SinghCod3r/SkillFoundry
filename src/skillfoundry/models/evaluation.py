@@ -18,6 +18,7 @@ class EvaluationType(str, Enum):
     LLM_JUDGE = "llm_judge"
     COMMAND_RESULT = "command_result"
     FILE_DIFF = "file_diff"
+    PYTHON_AST = "python_ast"
 
 
 class EvaluationTask(BaseModel):

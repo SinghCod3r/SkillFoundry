@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import json
 import re
 from typing import Protocol
@@ -123,6 +124,33 @@ class LLMJudge:
         )
 
 
+
+class PythonASTJudge:
+    def evaluate(self, task: EvaluationTask, response: str) -> TaskResult:
+        import re
+        match = re.search(r"```python\s+(.*?)\s+```", response, re.DOTALL)
+        if match:
+            code = match.group(1)
+        else:
+            code = response
+            
+        try:
+            ast.parse(code)
+            passed = True
+            reason = "Successfully parsed Python AST"
+        except SyntaxError as e:
+            passed = False
+            reason = f"SyntaxError: {e}"
+            
+        score = 1.0 if passed else 0.0
+        return TaskResult(
+            task_id=task.id,
+            passed=passed,
+            scores={"correctness": score},
+            judge_reasoning=reason,
+            label="python-ast"
+        )
+
 class JudgeFactory:
     """Factory to create evaluation judges."""
     @staticmethod
@@ -137,5 +165,7 @@ class JudgeFactory:
             if not provider:
                 raise ValueError("ModelProvider required for LLMJudge")
             return LLMJudge(provider)
+        elif evaluation_type == EvaluationType.PYTHON_AST:
+            return PythonASTJudge()
         else:
             raise ValueError(f"Unknown evaluation type: {evaluation_type}")
