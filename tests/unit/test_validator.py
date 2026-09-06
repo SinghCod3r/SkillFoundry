@@ -1,6 +1,7 @@
-import pytest
 from pathlib import Path
+
 from skillfoundry.skills.validator import SkillValidator
+
 
 def test_valid_skill():
     validator = SkillValidator()

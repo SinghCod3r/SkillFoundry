@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 import json
-import yaml
 from pathlib import Path
-from pydantic import BaseModel, Field
 
-from skillfoundry.providers.base import ModelProvider, GenerateRequest
-from skillfoundry.models.evaluation import EvaluationTask, EvaluationType
-from skillfoundry.models.analysis import ProjectAnalysis
-from skillfoundry.models.skill import GeneratedSkill
+import yaml
+from pydantic import BaseModel
+
 from skillfoundry.config import Settings
+from skillfoundry.models.analysis import ProjectAnalysis
+from skillfoundry.models.evaluation import EvaluationTask
+from skillfoundry.models.skill import GeneratedSkill
+from skillfoundry.providers.base import GenerateRequest, ModelProvider
 
 
 class TaskList(BaseModel):
@@ -47,7 +48,7 @@ class TaskGenerator:
             schema=TaskList.model_json_schema()
         )
         response_text = self.provider.generate(req)
-        
+
         try:
             data = json.loads(response_text)
             return TaskList.model_validate(data).tasks
@@ -58,7 +59,7 @@ class TaskGenerator:
         """Loads tasks from YAML files in the given directory."""
         tasks = []
         for file in tasks_dir.glob("*.yaml"):
-            with open(file, "r") as f:
+            with open(file) as f:
                 data = yaml.safe_load(f)
                 if isinstance(data, list):
                     for task_data in data:

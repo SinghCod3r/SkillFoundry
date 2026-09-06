@@ -28,11 +28,9 @@ def eval_cmd(
     """Evaluate a skill with baseline comparison."""
     from skillfoundry.config import load_config
     from skillfoundry.evaluation import EvaluationEngine, TaskGenerator
-    from skillfoundry.evaluation.comparison import compare_results
-    from skillfoundry.evaluation.scoring import aggregate_runs
+    from skillfoundry.models.report import ReportData
     from skillfoundry.providers import get_provider
-    from skillfoundry.reporting import JSONReporter, HTMLReporter
-    from skillfoundry.models.report import ReportData, ReportMetadata
+    from skillfoundry.reporting import HTMLReporter, JSONReporter
     from skillfoundry.skills.validator import SkillValidator, parse_frontmatter
 
     output: Output = ctx.obj.output

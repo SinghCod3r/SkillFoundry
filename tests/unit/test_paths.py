@@ -1,7 +1,9 @@
-import pytest
-import os
 from pathlib import Path
-from skillfoundry.security.paths import validate_path, safe_join
+
+import pytest
+
+from skillfoundry.security.paths import safe_join, validate_path
+
 
 def test_valid_path(tmp_path):
     workspace = tmp_path

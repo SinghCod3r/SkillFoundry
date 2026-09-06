@@ -1,11 +1,13 @@
 import pytest
-from skillfoundry.security.sandbox import validate_command, run_sandboxed
+
+from skillfoundry.security.sandbox import run_sandboxed, validate_command
+
 
 @pytest.mark.security
 def test_blocked_commands():
     with pytest.raises(ValueError):
         validate_command(["rm", "-rf", "/"])
-        
+
     with pytest.raises(ValueError):
         validate_command(["sudo", "ls"])
 

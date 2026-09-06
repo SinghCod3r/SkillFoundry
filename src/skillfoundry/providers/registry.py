@@ -9,7 +9,7 @@ from skillfoundry.providers.base import ModelProvider
 
 class ProviderRegistry:
     """Registry for managing model providers."""
-    
+
     _providers: dict[str, type[ModelProvider]] = {}
 
     @classmethod
@@ -38,7 +38,7 @@ class ProviderRegistry:
 def get_provider(settings: ModelSettings) -> ModelProvider:
     """Create a provider instance from settings."""
     provider_name = getattr(settings, "provider", None)
-    
+
     # Auto-detect from environment if not specified
     if not provider_name:
         if os.getenv("OPENAI_API_KEY"):

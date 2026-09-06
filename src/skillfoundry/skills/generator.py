@@ -4,15 +4,15 @@ Skill generation from project analysis using LLMs.
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Any
+
 from pydantic import BaseModel, Field
 
-from skillfoundry.providers.base import ModelProvider, GenerateRequest
-from skillfoundry.models.skill import GeneratedSkill, SkillMetadata, ReferenceFile, SkillClaim
-from skillfoundry.models.analysis import ProjectAnalysis
-from skillfoundry.config import Settings
-from skillfoundry.skills.naming import generate_skill_name
 from skillfoundry.analysis.context import select_context
+from skillfoundry.config import Settings
+from skillfoundry.models.analysis import ProjectAnalysis
+from skillfoundry.models.skill import GeneratedSkill, ReferenceFile, SkillClaim, SkillMetadata
+from skillfoundry.providers.base import GenerateRequest, ModelProvider
+from skillfoundry.skills.naming import generate_skill_name
 
 logger = logging.getLogger(__name__)
 
@@ -26,21 +26,21 @@ class SkillGenerationOutput(BaseModel):
 
 class SkillGenerator:
     """Generates Agent Skills from project analysis."""
-    
+
     def __init__(self, provider: ModelProvider, settings: Settings):
         self.provider = provider
         self.settings = settings
-        
+
     def generate(self, analysis: ProjectAnalysis) -> GeneratedSkill:
         """
         Generate a complete skill from the provided project analysis.
         """
         # 1. Build context
         context = select_context(analysis, self.settings)
-        
+
         # 2. Generate name
         skill_name = generate_skill_name(analysis)
-        
+
         # 3. System prompt
         system_prompt = (
             "You are an expert AI agent skill generator. "
@@ -51,24 +51,24 @@ class SkillGenerator:
             "DO NOT hallucinate APIs or commands not found in the source. "
             "Include ONLY information supported by the analysis."
         )
-        
+
         request = GenerateRequest(
             system_prompt=system_prompt,
             prompt=f"Generate skill for project named '{skill_name}'. Context:\\n{context}",
             response_model=SkillGenerationOutput
         )
-        
+
         # Call provider
         response_data = self.provider.structured_generate(request)
         if not isinstance(response_data, SkillGenerationOutput):
             raise TypeError("Provider did not return a SkillGenerationOutput instance.")
-            
+
         # 4. Parse and validate
         metadata = SkillMetadata(
             name=skill_name,
             description=response_data.description
         )
-        
+
         # 5. Generate reference files
         reference_files = [
             ReferenceFile(
@@ -77,7 +77,7 @@ class SkillGenerator:
             )
             for ref in response_data.references
         ]
-        
+
         # 6. Track claims
         claims = [
             SkillClaim(
@@ -87,7 +87,7 @@ class SkillGenerator:
             )
             for claim in response_data.claims
         ]
-        
+
         # 7. Return generated skill
         return GeneratedSkill(
             metadata=metadata,

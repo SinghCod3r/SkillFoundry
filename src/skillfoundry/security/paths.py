@@ -3,16 +3,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
+
 def validate_path(path: str | Path, workspace: str | Path) -> Path:
     """Resolve and verify a path is within workspace. Raise ValueError on traversal attempt."""
     resolved_path = Path(path).resolve()
     resolved_workspace = Path(workspace).resolve()
-    
+
     try:
         resolved_path.relative_to(resolved_workspace)
     except ValueError:
         raise ValueError(f"Path traversal detected: {path} is outside workspace {workspace}")
-    
+
     return resolved_path
 
 def safe_join(base: str | Path, *parts: str) -> Path:
@@ -34,7 +35,7 @@ def resolve_symlink_safely(path: str | Path, workspace: str | Path) -> Path | No
     p = Path(path)
     if not p.is_symlink():
         return p if is_path_safe(p, workspace) else None
-        
+
     resolved = p.resolve()
     if is_path_safe(resolved, workspace):
         return resolved

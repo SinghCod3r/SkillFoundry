@@ -3,8 +3,6 @@ from __future__ import annotations
 import difflib
 from pathlib import Path
 
-from skillfoundry.models.skill import GeneratedSkill
-
 
 def generate_diff(old_content: str, new_content: str) -> str:
     """Generates a human-readable unified diff between two strings."""
@@ -20,23 +18,23 @@ def generate_diff(old_content: str, new_content: str) -> str:
 def generate_skill_diff(old_dir: Path, new_dir: Path) -> str:
     """Compares all files in both skill directories and returns a combined diff."""
     diffs = []
-    
+
     old_files = {p.name: p for p in old_dir.rglob("*") if p.is_file()}
     new_files = {p.name: p for p in new_dir.rglob("*") if p.is_file()}
-    
+
     all_names = set(old_files.keys()).union(new_files.keys())
-    
+
     for name in sorted(all_names):
         old_p = old_files.get(name)
         new_p = new_files.get(name)
-        
+
         old_content = old_p.read_text() if old_p else ""
         new_content = new_p.read_text() if new_p else ""
-        
+
         if old_content != new_content:
             diffs.append(f"--- a/{name}\n+++ b/{name}\n")
             diffs.append(generate_diff(old_content, new_content))
-            
+
     return "".join(diffs)
 
 

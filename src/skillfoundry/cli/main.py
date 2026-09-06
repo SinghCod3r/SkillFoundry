@@ -6,15 +6,16 @@ import traceback
 import click
 
 from skillfoundry import __version__
-from skillfoundry.config import load_config
-from skillfoundry.cli.output import Output
 
 # Subcommands will be imported and registered here
 from skillfoundry.cli.build import build
-from skillfoundry.cli.validate import validate
+from skillfoundry.cli.compare import compare
 from skillfoundry.cli.eval_cmd import eval_cmd
 from skillfoundry.cli.improve import improve
-from skillfoundry.cli.compare import compare
+from skillfoundry.cli.output import Output
+from skillfoundry.cli.validate import validate
+from skillfoundry.config import load_config
+
 
 class ContextObject:
     """Context object to pass state to commands."""
@@ -44,7 +45,7 @@ class SafeGroup(click.Group):
             if obj:
                 obj.output.error(str(e))
             else:
-                click.echo(f"✗ {str(e)}", err=True)
+                click.echo(f"✗ {e!s}", err=True)
             sys.exit(1)
 
 @click.group(cls=SafeGroup)

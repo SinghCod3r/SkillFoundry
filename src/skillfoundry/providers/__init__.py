@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-from skillfoundry.providers.base import ModelProvider, GenerateRequest, GenerateResponse, ModelCapability
+from skillfoundry.providers.base import (
+    GenerateRequest,
+    GenerateResponse,
+    ModelCapability,
+    ModelProvider,
+)
 from skillfoundry.providers.registry import ProviderRegistry, get_provider
 
 __all__ = [
-    "ModelProvider",
     "GenerateRequest",
     "GenerateResponse",
     "ModelCapability",
+    "ModelProvider",
     "ProviderRegistry",
     "get_provider",
 ]

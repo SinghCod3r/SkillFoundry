@@ -1,8 +1,10 @@
 from __future__ import annotations
+
 import click
 from rich.console import Console
 from rich.table import Table
-from .printer import PrinterManager, Printer, PrintJob
+
+from .printer import PrinterManager
 
 console = Console()
 
@@ -16,12 +18,12 @@ def list_printers() -> None:
     """List all configured printers."""
     manager = PrinterManager()
     printers = manager.list_printers()
-    
+
     table = Table(title="CUPS Printers")
     table.add_column("Name", style="cyan")
     table.add_column("State", style="magenta")
     table.add_column("URI", style="green")
-    
+
     for p in printers:
         table.add_row(p.name, p.state, p.uri)
     console.print(table)
@@ -35,7 +37,7 @@ def status(name: str) -> None:
     if not printer:
         console.print(f"[red]Error: Printer '{name}' not found.[/red]")
         return
-    
+
     console.print(f"[bold]Printer:[/bold] {printer.name}")
     console.print(f"[bold]State:[/bold] {printer.state}")
     console.print(f"[bold]Driver:[/bold] {printer.driver}")
@@ -70,17 +72,17 @@ def queue(printer: str | None) -> None:
     """View the print queue."""
     manager = PrinterManager()
     jobs = manager.get_queue(printer)
-    
+
     if not jobs:
         console.print("No jobs in the queue.")
         return
-        
+
     table = Table(title=f"Print Queue {f'({printer})' if printer else ''}")
     table.add_column("ID", justify="right", style="cyan")
     table.add_column("User", style="magenta")
     table.add_column("Printer", style="green")
     table.add_column("State")
-    
+
     for job in jobs:
         table.add_row(str(job.id), job.user, job.printer, job.state)
     console.print(table)

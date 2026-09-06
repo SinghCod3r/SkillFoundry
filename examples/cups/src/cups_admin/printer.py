@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional, List
 from datetime import datetime
+
 
 @dataclass
 class Printer:
@@ -26,7 +27,7 @@ class PrintJob:
 
 class PrinterManager:
     """Manages CUPS printers and print queues."""
-    
+
     def __init__(self) -> None:
         # Mock data for demonstration purposes
         self._printers = {
@@ -38,11 +39,11 @@ class PrinterManager:
             PrintJob(2, "Epson-Stylus", "root", "test_page.txt", "processing", 1024, datetime.now()),
         ]
 
-    def list_printers(self) -> List[Printer]:
+    def list_printers(self) -> list[Printer]:
         """List all configured printers."""
         return list(self._printers.values())
 
-    def get_printer(self, name: str) -> Optional[Printer]:
+    def get_printer(self, name: str) -> Printer | None:
         """Get a printer by name."""
         return self._printers.get(name)
 
@@ -61,7 +62,7 @@ class PrinterManager:
             return True
         return False
 
-    def get_queue(self, printer_name: Optional[str] = None) -> List[PrintJob]:
+    def get_queue(self, printer_name: str | None = None) -> list[PrintJob]:
         """Get the print queue, optionally filtered by printer name."""
         if printer_name:
             return [j for j in self._jobs if j.printer == printer_name]

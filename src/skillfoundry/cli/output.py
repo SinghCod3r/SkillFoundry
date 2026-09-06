@@ -8,9 +8,10 @@ from rich.table import Table
 
 from skillfoundry import __version__
 
+
 class Output:
     """Terminal output helpers using Rich."""
-    
+
     def __init__(self, quiet: bool = False, json_mode: bool = False) -> None:
         self.quiet = quiet
         self.json_mode = json_mode

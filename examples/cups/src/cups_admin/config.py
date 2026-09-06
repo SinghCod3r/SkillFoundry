@@ -1,9 +1,10 @@
 from __future__ import annotations
-import os
+
 import json
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Any
+
 
 @dataclass
 class ServerConfig:
@@ -23,7 +24,7 @@ class Config:
 
 class ConfigManager:
     """Manages the application configuration."""
-    
+
     def __init__(self, config_path: str = "~/.cups-admin/config.json") -> None:
         self.config_path = Path(os.path.expanduser(config_path))
         self.config = Config()
@@ -32,10 +33,10 @@ class ConfigManager:
         """Load configuration from file."""
         if not self.config_path.exists():
             return
-            
-        with open(self.config_path, 'r') as f:
+
+        with open(self.config_path) as f:
             data = json.load(f)
-            
+
         if 'server' in data:
             self.config.server = ServerConfig(**data['server'])
         if 'defaults' in data:

@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-import os
 import fnmatch
 import logging
+import os
 from pathlib import Path
 
-from skillfoundry.models.analysis import FileInfo, FileCategory
 from skillfoundry.config.settings import AnalysisSettings
+from skillfoundry.models.analysis import FileCategory, FileInfo
 
 try:
     from skillfoundry.security.redaction import is_secret_file
@@ -34,46 +34,46 @@ def discover_files(root: Path, settings: AnalysisSettings) -> list[FileInfo]:
 
     for dirpath, dirnames, filenames in os.walk(root):
         rel_dir = Path(dirpath).relative_to(root)
-        
+
         # Apply excludes to directories to prevent descending
         dirnames[:] = [d for d in dirnames if not any(fnmatch.fnmatch(str(rel_dir / d), pat) for pat in settings.exclude_patterns)]
-        
+
         for filename in filenames:
             file_path = Path(dirpath) / filename
             rel_path = file_path.relative_to(root)
-            
+
             if any(fnmatch.fnmatch(str(rel_path), pat) for pat in settings.exclude_patterns):
                 continue
-                
+
             if file_count >= settings.max_files:
                 logger.warning(f"Max files limit reached ({settings.max_files}). Stopping discovery.")
                 break
-                
+
             if not file_path.is_file():
                 continue
-                
+
             try:
                 size = file_path.stat().st_size
             except Exception:
                 continue
-                
+
             if size > settings.max_file_size:
                 logger.warning(f"Skipping {rel_path}: file size {size} exceeds max_file_size {settings.max_file_size}")
                 continue
-                
+
             if total_bytes + size > settings.max_total_bytes:
-                logger.warning(f"Max total bytes limit reached. Stopping discovery.")
+                logger.warning("Max total bytes limit reached. Stopping discovery.")
                 break
-                
+
             if is_binary(file_path):
                 continue
-                
+
             is_generated = filename in {"package-lock.json", "yarn.lock", "Pipfile.lock", "poetry.lock", "Gemfile.lock", "go.sum"} or filename.endswith(".min.js")
             is_secret = is_secret_file(file_path)
-            
+
             category = FileCategory.OTHER
             score = 0.2
-            
+
             if filename.startswith("README") or rel_path.parts[0] == "docs" or filename.endswith((".md", ".rst")) or (filename.endswith(".txt") and "doc" in str(rel_path)):
                 category = FileCategory.DOCUMENTATION
                 score = 1.0
@@ -104,9 +104,9 @@ def discover_files(root: Path, settings: AnalysisSettings) -> list[FileInfo]:
             elif filename.endswith((".py", ".js", ".ts", ".go", ".rs", ".java", ".rb", ".php", ".c", ".cpp", ".h")):
                 category = FileCategory.SOURCE
                 score = 0.4
-                
+
             language = file_path.suffix.lstrip(".")
-            
+
             info = FileInfo(
                 path=str(rel_path),
                 size=size,
@@ -119,9 +119,9 @@ def discover_files(root: Path, settings: AnalysisSettings) -> list[FileInfo]:
             discovered.append(info)
             total_bytes += size
             file_count += 1
-            
+
         if file_count >= settings.max_files or total_bytes >= settings.max_total_bytes:
             break
-            
+
     discovered.sort(key=lambda x: x.relevance_score, reverse=True)
     return discovered

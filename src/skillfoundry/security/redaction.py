@@ -10,7 +10,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 SECRET_FILE_PATTERNS = [
-    ".env", ".env.*", "*.pem", "*.key", "*credentials*", "*secrets*", 
+    ".env", ".env.*", "*.pem", "*.key", "*credentials*", "*secrets*",
     "*.p12", "*.pfx", "id_rsa*", "id_ed25519*"
 ]
 
@@ -96,7 +96,7 @@ def redact_env_values(content: str) -> str:
         value = match.group("value").strip()
         if not value or (value.startswith("[") and value.endswith("]")):
             return match.group(0)
-        
+
         if has_high_entropy(value) or len(value) > 8:
             logger.warning(f"Redacting sensitive environment variable: {key}")
             return f"{key}=[REDACTED]"
@@ -111,6 +111,6 @@ def redact_secrets(content: str) -> str:
         if sp.pattern.search(redacted):
             logger.warning(f"Redacting secret matching pattern: {sp.name}")
             redacted = sp.pattern.sub(sp.replacement, redacted)
-    
+
     redacted = redact_env_values(redacted)
     return redacted

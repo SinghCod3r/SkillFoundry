@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -99,7 +98,7 @@ class EvaluationRun(BaseModel):
     """A single evaluation run (one pass through all tasks)."""
 
     run_id: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
     model: str = ""
     provider: str = ""
     temperature: float = 0.0

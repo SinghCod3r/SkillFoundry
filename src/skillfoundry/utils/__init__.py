@@ -4,6 +4,7 @@ import hashlib
 import time
 from pathlib import Path
 
+
 def hash_file(path: Path) -> str:
     """Return SHA256 hash of file contents."""
     h = hashlib.sha256()
@@ -20,16 +21,16 @@ def hash_directory(path: Path) -> str:
     """Return hash of all file hashes in directory (sorted)."""
     if not path.is_dir():
         raise ValueError(f"{path} is not a directory")
-        
+
     hashes = []
     for file_path in sorted(path.rglob("*")):
         if file_path.is_file():
             hashes.append(hash_file(file_path))
-            
+
     h = hashlib.sha256()
     for file_hash in hashes:
         h.update(file_hash.encode('utf-8'))
-        
+
     return h.hexdigest()
 
 def format_size(bytes_size: int) -> str:
@@ -54,10 +55,10 @@ def elapsed_ms(start_time: float) -> float:
     return (time.perf_counter() - start_time) * 1000.0
 
 __all__ = [
+    "elapsed_ms",
+    "format_size",
+    "hash_directory",
     "hash_file",
     "hash_string",
-    "hash_directory",
-    "format_size",
-    "truncate",
-    "elapsed_ms"
+    "truncate"
 ]

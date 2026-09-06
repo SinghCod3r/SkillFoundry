@@ -1,5 +1,7 @@
 import pytest
-from skillfoundry.security.paths import validate_path, safe_join
+
+from skillfoundry.security.paths import safe_join, validate_path
+
 
 @pytest.mark.security
 def test_traversal_in_generated_path(tmp_path):

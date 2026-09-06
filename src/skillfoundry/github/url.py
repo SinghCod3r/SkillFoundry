@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from skillfoundry.security.urls import validate_url, parse_github_url
+from skillfoundry.security.urls import validate_url
 
 
 def is_github_url(url: str) -> bool:

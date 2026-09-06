@@ -1,6 +1,6 @@
-import pytest
 # Assuming these functions exist or need to be written, testing them as requested
-from skillfoundry.security.redaction import redact_secrets, is_secret_file
+from skillfoundry.security.redaction import is_secret_file, redact_secrets
+
 
 def test_redact_api_keys():
     content = "OPENAI_API_KEY=sk-1234abcd5678efgh9012ijkl"

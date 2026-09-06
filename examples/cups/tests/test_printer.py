@@ -1,6 +1,7 @@
 from __future__ import annotations
-import pytest
-from cups_admin.printer import PrinterManager, Printer, PrintJob
+
+from cups_admin.printer import PrinterManager
+
 
 def test_list_printers():
     manager = PrinterManager()
@@ -13,7 +14,7 @@ def test_get_printer():
     printer = manager.get_printer("HP-LaserJet")
     assert printer is not None
     assert printer.name == "HP-LaserJet"
-    
+
     missing = manager.get_printer("Non-Existent")
     assert missing is None
 
@@ -33,7 +34,7 @@ def test_get_queue():
     manager = PrinterManager()
     queue = manager.get_queue()
     assert len(queue) == 2
-    
+
     filtered = manager.get_queue("HP-LaserJet")
     assert len(filtered) == 1
     assert filtered[0].printer == "HP-LaserJet"

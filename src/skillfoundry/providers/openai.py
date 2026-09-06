@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import time
-from typing import Any, TypeVar
+from typing import TypeVar
 
 from pydantic import BaseModel
 
@@ -25,15 +25,15 @@ except ImportError:
 
 class OpenAIProvider:
     """OpenAI implementation of ModelProvider."""
-    
+
     def __init__(self, api_key: str | None = None, model: str = "gpt-4o", api_base: str | None = None) -> None:
         if openai is None:
             raise ImportError("OpenAI SDK is not installed. Please run `pip install skillfoundry[openai]` or `pip install openai`.")
-        
+
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
             raise ValueError("OpenAI API key must be provided or set in OPENAI_API_KEY environment variable.")
-        
+
         self.model = model
         self.client = OpenAI(api_key=self.api_key, base_url=api_base)
 
@@ -58,16 +58,16 @@ class OpenAIProvider:
                 max_tokens=request.max_tokens,
             )
             latency = (time.time() - start_time) * 1000
-            
+
             content = response.choices[0].message.content or ""
             usage = response.usage
             token_usage = {
                 "input_tokens": usage.prompt_tokens if usage else 0,
                 "output_tokens": usage.completion_tokens if usage else 0,
             }
-            
+
             raw = response.model_dump() if hasattr(response, "model_dump") else {}
-            
+
             return GenerateResponse(
                 content=content,
                 model=self.model,
@@ -101,13 +101,13 @@ class OpenAIProvider:
                 return response.choices[0].message.parsed
         except Exception:
             pass # Fallback to base text + parse approach
-            
+
         # Fallback approach
         max_retries = 3
         req = request.model_copy()
-        
+
         req.system_prompt += f"\n\nYou must output strictly valid JSON conforming to this schema:\n{schema.model_json_schema()}"
-        
+
         for attempt in range(max_retries):
             try:
                 resp = self.generate(req)
@@ -116,7 +116,7 @@ class OpenAIProvider:
                 if attempt == max_retries - 1:
                     raise
                 req.user_prompt += f"\n\nPrevious response failed to parse as JSON or validation failed. Error: {e}\nPlease correct the JSON output."
-                
+
         raise ValueError("Failed to generate structured output after retries.")
 
 # Check compatibility

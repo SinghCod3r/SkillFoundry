@@ -93,9 +93,9 @@ class ModelProvider(Protocol):
         """
         max_retries = 3
         req = request.model_copy()
-        
+
         req.system_prompt += f"\n\nYou must output strictly valid JSON conforming to this schema:\n{schema.model_json_schema()}"
-        
+
         for attempt in range(max_retries):
             try:
                 response = self.generate(req)
@@ -104,5 +104,5 @@ class ModelProvider(Protocol):
                 if attempt == max_retries - 1:
                     raise
                 req.user_prompt += f"\n\nPrevious response failed to parse as JSON or validation failed. Error: {e}\nPlease correct the JSON output."
-                
+
         raise ValueError("Failed to generate structured output after retries.")

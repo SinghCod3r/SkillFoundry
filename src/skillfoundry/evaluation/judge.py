@@ -3,10 +3,16 @@ from __future__ import annotations
 import json
 import re
 from typing import Protocol
+
 from pydantic import BaseModel
 
-from skillfoundry.models.evaluation import EvaluationTask, EvaluationType, TaskResult, DimensionScore
-from skillfoundry.providers.base import ModelProvider, GenerateRequest
+from skillfoundry.models.evaluation import (
+    DimensionScore,
+    EvaluationTask,
+    EvaluationType,
+    TaskResult,
+)
+from skillfoundry.providers.base import GenerateRequest, ModelProvider
 
 
 class JudgeOutput(BaseModel):
@@ -90,7 +96,7 @@ class LLMJudge:
             f"Task Criteria: {task.criteria}\n"
             f"Response to evaluate:\n{response}"
         )
-        
+
         req = GenerateRequest(
             prompt=user_prompt,
             system_prompt=system_prompt,
@@ -102,10 +108,10 @@ class LLMJudge:
             output = JudgeOutput.model_validate(data)
         except Exception:
             raise ValueError("Failed to parse LLM Judge output.")
-            
+
         avg_score = (output.correctness + output.task_success + output.instruction_following + output.safety + output.efficiency) / 5.0
         passed = avg_score >= 0.7
-        
+
         dimensions = [
             DimensionScore(dimension="correctness", score=output.correctness),
             DimensionScore(dimension="task_success", score=output.task_success),
