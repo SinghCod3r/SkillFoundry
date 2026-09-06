@@ -1,0 +1,9 @@
+[project]
+name = "cups-admin"
+version = "0.3.0"
+description = "Command-line toolkit for managing CUPS printers and queues"
+requires-python = ">=3.9"
+dependencies = ["click>=8.0", "rich>=13.0", "pycups>=2.0"]
+
+[project.scripts]
+cups-admin = "cups_admin.cli:main"

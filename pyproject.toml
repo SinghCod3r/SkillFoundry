@@ -1,0 +1,108 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "skillfoundry"
+version = "0.1.0"
+description = "Build AI Agent Skills that actually work."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [{ name = "SkillFoundry Contributors" }]
+keywords = ["ai", "agent", "skills", "evaluation", "llm"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
+dependencies = [
+    "click>=8.1",
+    "pydantic>=2.0",
+    "rich>=13.0",
+    "pyyaml>=6.0",
+    "httpx>=0.27",
+    "jinja2>=3.1",
+    "gitpython>=3.1",
+]
+
+[project.optional-dependencies]
+openai = ["openai>=1.0"]
+anthropic = ["anthropic>=0.30"]
+google = ["google-generativeai>=0.7"]
+all-providers = [
+    "skillfoundry[openai]",
+    "skillfoundry[anthropic]",
+    "skillfoundry[google]",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+    "pyright>=1.1",
+    "pre-commit>=3.0",
+]
+
+[project.scripts]
+skillfoundry = "skillfoundry.cli.main:cli"
+
+[project.urls]
+Homepage = "https://github.com/skillfoundry/skillfoundry"
+Documentation = "https://github.com/skillfoundry/skillfoundry#readme"
+Repository = "https://github.com/skillfoundry/skillfoundry"
+Issues = "https://github.com/skillfoundry/skillfoundry/issues"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific
+    "S",    # flake8-bandit (security)
+    "T20",  # flake8-print
+]
+ignore = [
+    "S101",   # assert used (ok in tests)
+    "S603",   # subprocess call - check for untrusted input
+    "S607",   # partial path to executable
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "T20"]
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+include = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow",
+    "security: marks security tests",
+    "integration: marks integration tests",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/skillfoundry"]

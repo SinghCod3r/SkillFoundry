@@ -1,0 +1,19 @@
+[project]
+# The name of your skill
+name = "my-skill"
+
+[analysis]
+# Maximum number of files to analyze in the repository
+max_files = 5000
+# Maximum file size to analyze in bytes (default 1MB)
+max_file_size = 1000000
+
+[evaluation]
+# Number of runs to perform for each task in evaluation
+runs = 3
+# Timeout in seconds for each evaluation task run
+timeout = 60
+
+[model]
+# Provider to use for LLM calls. Options: "openai", "anthropic", "google"
+provider = "openai"

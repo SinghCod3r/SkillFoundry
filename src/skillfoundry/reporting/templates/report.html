@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillFoundry Report - {{ report.skill_name }}</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --accent: #2563EB;
+            --border: #e5e7eb;
+            --radius: 6px;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+            
+            --score-green: #10b981;
+            --score-yellow: #f59e0b;
+            --score-red: #ef4444;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111827;
+                --text: #f9fafb;
+                --text-light: #9ca3af;
+                --border: #374151;
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            margin: 0;
+            padding: 2rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .header-meta {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: var(--bg);
+        }
+
+        .score-container {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+        }
+
+        .score-large {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .score-card {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .score-card .label {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .score-card .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .score-green { color: var(--score-green); }
+        .score-yellow { color: var(--score-yellow); }
+        .score-red { color: var(--score-red); }
+
+        pre, code {
+            font-family: var(--font-mono);
+            font-size: 0.875em;
+            background: var(--border);
+            border-radius: 4px;
+            padding: 0.2em 0.4em;
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            pre {
+                background: rgba(255, 255, 255, 0.05);
+            }
+        }
+
+        details {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        summary {
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        details > div {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .task-success { border-left: 4px solid var(--score-green); }
+        .task-failure { border-left: 4px solid var(--score-red); }
+
+        .list-unstyled {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list-unstyled li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .list-unstyled li:last-child {
+            border-bottom: none;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        @media print {
+            body {
+                color: black;
+                background: white;
+            }
+            .card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SkillFoundry Report: {{ report.skill_name }}</h1>
+        <div class="header-meta">
+            <span>Source: {{ report.source_path }}</span>
+            <span>Date: {{ report.metadata.timestamp }}</span>
+            <span>Version: {{ report.metadata.version }}</span>
+        </div>
+    </div>
+
+    {% if report.evaluation %}
+    <div class="card">
+        <h2>Overall Score</h2>
+        <div class="score-container">
+            {% set s = report.evaluation.score.overall %}
+            <span class="score-large {% if s >= 80 %}score-green{% elif s >= 60 %}score-yellow{% else %}score-red{% endif %}">
+                {{ "%.1f"|format(s) }}
+            </span>
+            <span>/ 100</span>
+        </div>
+    </div>
+
+    <h3>Dimensions</h3>
+    <div class="grid">
+        {% for dim, value in report.evaluation.score.dimensions.items() %}
+        <div class="score-card">
+            <div class="label">{{ dim }}</div>
+            <div class="value {% if value >= 80 %}score-green{% elif value >= 60 %}score-yellow{% else %}score-red{% endif %}">
+                {{ "%.1f"|format(value) }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if report.evaluation.task_results %}
+    <h3>Task Results</h3>
+    <div>
+        {% for task in report.evaluation.task_results %}
+        <details class="{% if task.success %}task-success{% else %}task-failure{% endif %}">
+            <summary>{{ task.task.name }} - {% if task.success %}Pass{% else %}Fail{% endif %}</summary>
+            <div>
+                <p><strong>Description:</strong> {{ task.task.description }}</p>
+                {% if task.output %}
+                <p><strong>Output:</strong></p>
+                <pre>{{ task.output }}</pre>
+                {% endif %}
+                {% if task.error %}
+                <p><strong>Error:</strong></p>
+                <pre>{{ task.error }}</pre>
+                {% endif %}
+            </div>
+        </details>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endif %}
+
+    {% if report.comparison %}
+    <h3>Comparison</h3>
+    <div class="card">
+        <p><strong>Baseline Score:</strong> {{ "%.1f"|format(report.comparison.baseline_score) }}</p>
+        <p><strong>Improvement:</strong> {{ "%.1f"|format(report.comparison.improvement) }}</p>
+    </div>
+    {% endif %}
+
+    {% if report.warnings %}
+    <h3>Warnings</h3>
+    <div class="card" style="border-left: 4px solid var(--score-yellow);">
+        <ul style="margin: 0; padding-left: 1.5rem;">
+            {% for warning in report.warnings %}
+            <li>{{ warning }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if report.recommendations %}
+    <h3>Recommendations</h3>
+    <div class="card">
+        <ul style="margin: 0; padding-left: 1.5rem;">
+            {% for rec in report.recommendations %}
+            <li>{{ rec }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {% if report.generated_files %}
+    <h3>Generated Files</h3>
+    <div class="card">
+        <ul class="list-unstyled" style="margin: 0;">
+            {% for file in report.generated_files %}
+            <li><code>{{ file }}</code></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <h3>Metadata</h3>
+    <div class="card">
+        <ul class="list-unstyled" style="margin: 0;">
+            <li><strong>Model:</strong> {{ report.metadata.model_name }}</li>
+            <li><strong>Duration:</strong> {{ "%.2f"|format(report.metadata.duration_ms / 1000) }}s</li>
+            <li><strong>System Hash:</strong> <code>{{ report.metadata.system_hash }}</code></li>
+            <li><strong>Environment:</strong> {{ report.metadata.environment }}</li>
+        </ul>
+    </div>
+</body>
+</html>

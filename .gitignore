@@ -1,0 +1,14 @@
+__pycache__
+*.pyc
+.venv
+venv
+dist
+build
+*.egg-info
+.ruff_cache
+.pyright
+.pytest_cache
+.coverage
+htmlcov
+.skillfoundry-cache
+.env
