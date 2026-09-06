@@ -10,7 +10,7 @@ class MockProvider(ModelProvider):
         
     def generate(self, request: GenerateRequest) -> GenerateResponse:
         self.requests.append(request)
-        return GenerateResponse(text=self.response_text)
+        return GenerateResponse(content=self.response_text, model="mock", provider="mock", token_usage={}, latency_ms=10)
 
 def test_llm_judge():
     mock_json = '{"correctness": 0.9, "task_success": 1.0, "instruction_following": 0.8, "safety": 1.0, "efficiency": 0.7, "reasoning": "Looks good"}'

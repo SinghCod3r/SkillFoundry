@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 
+from pathlib import Path
 from skillfoundry.models.analysis import ProjectAnalysis
 from skillfoundry.models.skill import (
     SKILL_NAME_MAX_LENGTH,
@@ -19,7 +20,7 @@ def generate_skill_name(analysis: ProjectAnalysis) -> str:
     Generate a skill name from project analysis.project_metadata.
     Uses project name if available, otherwise falls back to directory name.
     """
-    raw_name = analysis.project_metadata.name if analysis.project_metadata and analysis.project_metadata.name else analysis.project_metadata.directory_name
+    raw_name = analysis.project_metadata.name if analysis.project_metadata and analysis.project_metadata.name else Path(analysis.source_path).name
     normalized_name = normalize_skill_name(raw_name)
 
     if raw_name != normalized_name:

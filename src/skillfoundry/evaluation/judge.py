@@ -89,11 +89,11 @@ class LLMJudge:
         )
 
         req = GenerateRequest(
-            prompt=user_prompt,
+            user_prompt=user_prompt,
             system_prompt=system_prompt,
             schema=JudgeOutput.model_json_schema()
         )
-        out_text = self.provider.generate(req).text
+        out_text = self.provider.generate(req).content
         try:
             data = json.loads(out_text)
             output = JudgeOutput.model_validate(data)

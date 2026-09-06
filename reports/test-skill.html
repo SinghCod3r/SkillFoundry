@@ -4,237 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillFoundry Report - test-skill</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg: #ffffff;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --accent: #2563EB;
-            --border: #e5e7eb;
-            --radius: 6px;
-            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-            
-            --score-green: #10b981;
-            --score-yellow: #f59e0b;
-            --score-red: #ef4444;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #111827;
-                --text: #f9fafb;
-                --text-light: #9ca3af;
-                --border: #374151;
-            }
-        }
-
-        body {
-            font-family: var(--font-sans);
-            background-color: var(--bg);
-            color: var(--text);
-            line-height: 1.5;
-            margin: 0;
-            padding: 2rem;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        h1, h2, h3, h4 {
-            font-weight: 600;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .header-meta {
-            color: var(--text-light);
-            font-size: 0.9rem;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            background: var(--bg);
-        }
-
-        .score-container {
-            display: flex;
-            align-items: baseline;
-            gap: 1rem;
-        }
-
-        .score-large {
-            font-size: 3rem;
-            font-weight: 700;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .score-card {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .score-card .label {
-            font-size: 0.875rem;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .score-card .value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-        }
-
-        .score-green { color: var(--score-green); }
-        .score-yellow { color: var(--score-yellow); }
-        .score-red { color: var(--score-red); }
-
-        pre, code {
-            font-family: var(--font-mono);
-            font-size: 0.875em;
-            background: var(--border);
-            border-radius: 4px;
-            padding: 0.2em 0.4em;
-        }
-
-        pre {
-            padding: 1rem;
-            overflow-x: auto;
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            pre {
-                background: rgba(255, 255, 255, 0.05);
-            }
-        }
-
-        details {
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-        }
-
-        summary {
-            padding: 1rem;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        details > div {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-        }
-
-        .task-success { border-left: 4px solid var(--score-green); }
-        .task-failure { border-left: 4px solid var(--score-red); }
-
-        .list-unstyled {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .list-unstyled li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .list-unstyled li:last-child {
-            border-bottom: none;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
-
-        @media print {
-            body {
-                color: black;
-                background: white;
-            }
-            .card {
-                break-inside: avoid;
-            }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        pre, code { font-family: 'JetBrains Mono', monospace; }
+        
+        pre::-webkit-scrollbar { height: 8px; }
+        pre::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        pre::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1>SkillFoundry Report: test-skill</h1>
-        <div class="header-meta">
-            <span>Source: /home/ayushcod3r/project_works/SkillFoundry/dist/test-skill</span>
-            <span>Date: 2026-09-06 06:22:26.295932+00:00</span>
-            <span>Version: </span>
-        </div>
-    </div>
-
-    
-    <div class="card">
-        <h2>Overall Score</h2>
-        <div class="score-container">
-            
-            <span class="score-large score-red">
-                0.0
-            </span>
-            <span>/ 100</span>
-        </div>
-    </div>
-
-    <h3>Dimensions</h3>
-    <div class="grid">
+<body class="bg-gray-50 text-gray-800 min-h-screen">
+    <div class="max-w-6xl mx-auto px-4 py-8">
         
-    </div>
-
-    
-    
-
-    
-
-    
-
-    
-
-    
-    <h3>Generated Files</h3>
-    <div class="card">
-        <ul class="list-unstyled" style="margin: 0;">
+        <header class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="h-10 w-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        T
+                    </div>
+                    <h1 class="text-3xl font-bold text-gray-900 tracking-tight">test-skill</h1>
+                </div>
+                <div class="text-sm text-gray-500 font-medium ml-[3.25rem]">
+                    Report &middot; 2026-09-06
+                </div>
+            </div>
             
-            <li><code>SKILL.md</code></li>
-            
-        </ul>
-    </div>
-    
+            <div class="flex flex-wrap gap-2 text-xs">
+                
+                <span class="inline-flex items-center gap-1 bg-gray-100 px-3 py-1.5 rounded-full text-gray-600 border border-gray-200">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    /home/ayushcod3r/project_works/SkillFoundry/dist/test-skill
+                </span>
+                
+                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                    v
+                </span>
+            </div>
+        </header>
 
-    <h3>Metadata</h3>
-    <div class="card">
-        <ul class="list-unstyled" style="margin: 0;">
-            <li><strong>Model:</strong> </li>
-                        <li><strong>System Hash:</strong> <code></code></li>
-            <li><strong>Environment:</strong> </li>
-        </ul>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col justify-center items-center relative overflow-hidden">
+                <h2 class="text-gray-500 text-sm font-semibold uppercase tracking-wider mb-4">Overall Score</h2>
+                
+                
+                
+                    
+                    
+                    
+                
+                
+                <div class="w-32 h-32 rounded-full bg-red-50 flex items-center justify-center ring-8 ring-red-100 mb-2">
+                    <span class="text-4xl font-bold text-red-500">0.0</span>
+                </div>
+                <div class="text-sm font-medium text-gray-400 mt-2">out of 100</div>
+            </div>
+
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h2 class="text-gray-800 text-lg font-bold mb-5 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Dimensions
+                </h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-8">
+                
+                
+                
+                <section>
+                    <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                        Task Results
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        
+                    </div>
+                </section>
+                
+            </div>
+
+            <div class="space-y-6">
+                
+                
+
+                
+
+                
+
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Generated Files
+                    </h3>
+                    <ul class="space-y-2 text-sm">
+                        
+                        <li class="flex items-center gap-2">
+                            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <code class="text-gray-700 bg-gray-100 px-1.5 py-0.5 rounded truncate" title="SKILL.md">SKILL.md</code>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3 border-b pb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        System Metadata
+                    </h3>
+                    <div class="space-y-3 text-sm">
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Provider & Model</span>
+                            <span class="font-medium text-gray-800"> / </span>
+                        </div>
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Skill Hash</span>
+                            <code class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded break-all"></code>
+                        </div>
+                        <div>
+                            <span class="block text-gray-500 text-xs font-medium mb-1">Task Set Hash</span>
+                            <code class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded break-all"></code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
