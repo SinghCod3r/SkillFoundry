@@ -1,0 +1,105 @@
+{
+  "skill_name": "test-skill",
+  "source_path": "/home/ayushcod3r/project_works/SkillFoundry/dist/test-skill",
+  "metadata": {
+    "skillfoundry_version": "",
+    "evaluation_version": "1.0",
+    "model_provider": "",
+    "model_identifier": "",
+    "skill_hash": "",
+    "task_set_hash": "",
+    "config_hash": "",
+    "timestamp": "2026-09-06T06:22:26.295932Z"
+  },
+  "evaluation": {
+    "version": "1",
+    "skill_name": "",
+    "skill_hash": "",
+    "evaluation_version": "1.0",
+    "config_hash": "",
+    "runs": [
+      {
+        "run_id": "f32e5f37",
+        "timestamp": "2026-09-06T06:22:26.293776Z",
+        "model": "default-model",
+        "provider": "default-provider",
+        "temperature": 0.0,
+        "task_results": [],
+        "score": {
+          "overall": 0.0,
+          "dimensions": [],
+          "task_count": 0,
+          "passed": 0,
+          "failed": 0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "variance": 0.0,
+          "num_runs": 1,
+          "single_run_warning": false
+        },
+        "errors": [],
+        "latency": 4.5299530029296875e-06
+      }
+    ],
+    "baseline_runs": [
+      {
+        "run_id": "4ed3c3d2",
+        "timestamp": "2026-09-06T06:22:26.293570Z",
+        "model": "default-model",
+        "provider": "default-provider",
+        "temperature": 0.0,
+        "task_results": [],
+        "score": {
+          "overall": 0.0,
+          "dimensions": [],
+          "task_count": 0,
+          "passed": 0,
+          "failed": 0,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "variance": 0.0,
+          "num_runs": 1,
+          "single_run_warning": false
+        },
+        "errors": [],
+        "latency": 4.0531158447265625e-06
+      }
+    ],
+    "aggregate_score": {
+      "overall": 0.0,
+      "dimensions": [],
+      "task_count": 0,
+      "passed": 0,
+      "failed": 0,
+      "mean": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "variance": 0.0,
+      "num_runs": 1,
+      "single_run_warning": true
+    },
+    "baseline_score": {
+      "overall": 0.0,
+      "dimensions": [],
+      "task_count": 0,
+      "passed": 0,
+      "failed": 0,
+      "mean": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "variance": 0.0,
+      "num_runs": 1,
+      "single_run_warning": true
+    },
+    "mean_scores": {},
+    "score_range": {}
+  },
+  "comparison": null,
+  "recommendations": [],
+  "generated_files": [
+    "SKILL.md"
+  ],
+  "warnings": []
+}

@@ -10,30 +10,29 @@ from skillfoundry.providers.base import (
     GenerateRequest,
     GenerateResponse,
     ModelCapability,
-    ModelProvider,
-    validate_and_parse,
 )
 
 T = TypeVar("T", bound=BaseModel)
 
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
 except ImportError:
     genai = None
 
 
 class GoogleProvider:
-    """Google Gemini implementation of ModelProvider."""
+    """Google Gemini implementation of ModelProvider using google-genai."""
 
-    def __init__(self, api_key: str | None = None, model: str = "gemini-2.0-flash") -> None:
+    def __init__(self, api_key: str | None = None, model: str = "gemini-2.5-flash") -> None:
         if genai is None:
-            raise ImportError("Google Generative AI SDK is not installed. Please run `pip install skillfoundry[google]` or `pip install google-generativeai`.")
+            raise ImportError("Google GenAI SDK is not installed. Please run `pip install google-genai`.")
 
         self.api_key = api_key or os.getenv("GOOGLE_API_KEY")
         if not self.api_key:
             raise ValueError("Google API key must be provided or set in GOOGLE_API_KEY environment variable.")
 
-        genai.configure(api_key=self.api_key)
+        self.client = genai.Client(api_key=self.api_key)
         self.model_name = model
 
     @property
@@ -47,23 +46,20 @@ class GoogleProvider:
         """Generate text using Google Gemini."""
         start_time = time.time()
         try:
-            model = genai.GenerativeModel(
-                self.model_name,
-                system_instruction=request.system_prompt if request.system_prompt else None
-            )
-
-            generation_config = genai.types.GenerationConfig(
+            config = types.GenerateContentConfig(
                 temperature=request.temperature,
                 max_output_tokens=request.max_tokens,
+                system_instruction=request.system_prompt if request.system_prompt else None,
             )
 
-            response = model.generate_content(
-                request.user_prompt,
-                generation_config=generation_config
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=request.user_prompt,
+                config=config,
             )
             latency = (time.time() - start_time) * 1000
 
-            content = response.text
+            content = response.text or ""
 
             input_tokens = 0
             output_tokens = 0
@@ -71,33 +67,43 @@ class GoogleProvider:
                 input_tokens = getattr(response.usage_metadata, "prompt_token_count", 0)
                 output_tokens = getattr(response.usage_metadata, "candidates_token_count", 0)
 
+            raw_response = {}
+            if hasattr(response, "model_dump"):
+                raw_response = response.model_dump()
+            elif hasattr(response, "to_dict"):
+                raw_response = response.to_dict()
+
             return GenerateResponse(
                 content=content,
                 model=self.model_name,
                 provider=self.name,
                 token_usage={"input_tokens": input_tokens, "output_tokens": output_tokens},
                 latency_ms=latency,
-                raw_response=response.to_dict() if hasattr(response, "to_dict") else {},
+                raw_response=raw_response,
             )
         except Exception as e:
-            raise RuntimeError(f"Google Generative AI Error: {e}") from e
+            raise RuntimeError(f"Google GenAI Error: {e}") from e
 
     def structured_generate(self, request: GenerateRequest, schema: type[T]) -> T:
-        """Generate structured output using text generation + JSON parsing fallback."""
-        max_retries = 3
-        req = request.model_copy()
+        """Generate structured output using GenAI response_schema."""
+        try:
+            config = types.GenerateContentConfig(
+                temperature=request.temperature,
+                max_output_tokens=request.max_tokens,
+                system_instruction=request.system_prompt if request.system_prompt else None,
+                response_mime_type="application/json",
+                response_schema=schema,
+            )
 
-        req.system_prompt += f"\n\nYou must output strictly valid JSON conforming to this schema:\n{schema.model_json_schema()}"
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=request.user_prompt,
+                config=config,
+            )
+            content = response.text
+            if not content:
+                raise ValueError("Received empty content from model.")
 
-        for attempt in range(max_retries):
-            try:
-                resp = self.generate(req)
-                return validate_and_parse(resp.content, schema)
-            except ValueError as e:
-                if attempt == max_retries - 1:
-                    raise
-                req.user_prompt += f"\n\nPrevious response failed to parse as JSON or validation failed. Error: {e}\nPlease correct the JSON output."
-
-        raise ValueError("Failed to generate structured output after retries.")
-
-# Check compatibility
+            return schema.model_validate_json(content)
+        except Exception as e:
+            raise RuntimeError(f"Google GenAI Structured Output Error: {e}") from e

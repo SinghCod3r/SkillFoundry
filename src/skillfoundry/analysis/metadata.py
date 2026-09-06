@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def extract_metadata(root: Path, files: list[FileInfo]) -> ProjectMetadata:
     """Extract package metadata from manifest files."""
-    metadata = ProjectMetadata(name="", version="", description="", dependencies=[], scripts={}, entry_points={}, license="")
+    metadata = ProjectMetadata(name="", version="", description="", dependencies=[], scripts={}, entry_points=[], license="")
 
     try:
         import tomllib

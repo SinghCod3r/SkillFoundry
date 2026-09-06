@@ -5,15 +5,15 @@ import uuid
 from pathlib import Path
 
 from skillfoundry.config import Settings
+from skillfoundry.evaluation.agent import BaselineAgent, SkillEnabledAgent
 from skillfoundry.evaluation.judge import JudgeFactory
 from skillfoundry.evaluation.scoring import aggregate_runs, calculate_score
 from skillfoundry.models.evaluation import (
     EvaluationResult,
     EvaluationRun,
     EvaluationTask,
-    ScoringWeights,
 )
-from skillfoundry.providers.base import GenerateRequest, ModelProvider
+from skillfoundry.providers.base import ModelProvider
 
 
 class EvaluationEngine:
@@ -34,28 +34,35 @@ class EvaluationEngine:
         run_id = str(uuid.uuid4())[:8]
         start_time = time.time()
 
-        for task in tasks:
-            prompt = task.prompt
-            if with_skill and skill_content:
-                prompt = f"Background Skill Information:\n{skill_content}\n\nTask:\n{prompt}"
-
-            req = GenerateRequest(
-                prompt=prompt,
-                temperature=self.settings.evaluation.temperature
+        if with_skill:
+            agent = SkillEnabledAgent(
+                model_provider=self.provider,
+                settings=self.settings,
+                skill_content=skill_content
             )
-            response = self.provider.generate(req)
+        else:
+            agent = BaselineAgent(
+                model_provider=self.provider,
+                settings=self.settings
+            )
+
+        for task in tasks:
+            response_text = agent.execute(task)
 
             judge = JudgeFactory.create(task.evaluation_type, self.provider)
-            res = judge.evaluate(task, response)
+            res = judge.evaluate(task, response_text)
             results.append(res)
 
         latency = time.time() - start_time
-        score = calculate_score(results, ScoringWeights(weights=self.settings.scoring.weights))
+        from skillfoundry.models.evaluation import ScoringWeights
+        import dataclasses
+        sw = ScoringWeights(**dataclasses.asdict(self.settings.scoring) if dataclasses.is_dataclass(self.settings.scoring) else self.settings.scoring.__dict__)
+        score = calculate_score(results, sw)
 
         return EvaluationRun(
             run_id=run_id,
             score=score,
-            results=results,
+            task_results=results,
             latency=latency,
             timestamp=start_time,
             model="default-model",
@@ -72,12 +79,14 @@ class EvaluationEngine:
             baseline_runs.append(self.run_evaluation(skill_path, tasks, with_skill=False))
             skill_runs.append(self.run_evaluation(skill_path, tasks, with_skill=True))
 
-        base_agg_score, _, _ = aggregate_runs(baseline_runs)
-        skill_agg_score, _, _ = aggregate_runs(skill_runs)
+        base_agg_score, base_mean, base_range = aggregate_runs(baseline_runs)
+        skill_agg_score, skill_mean, skill_range = aggregate_runs(skill_runs)
 
         return EvaluationResult(
-            score=skill_agg_score,
+            aggregate_score=skill_agg_score,
             baseline_score=base_agg_score,
             runs=skill_runs,
-            baseline_runs=baseline_runs
+            baseline_runs=baseline_runs,
+            mean_scores=skill_mean,
+            score_range=skill_range
         )

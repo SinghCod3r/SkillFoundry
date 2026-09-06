@@ -36,7 +36,7 @@ class SkillGenerator:
         Generate a complete skill from the provided project analysis.
         """
         # 1. Build context
-        context = select_context(analysis, self.settings)
+        context = select_context(analysis, 100000)
 
         # 2. Generate name
         skill_name = generate_skill_name(analysis)
@@ -54,12 +54,11 @@ class SkillGenerator:
 
         request = GenerateRequest(
             system_prompt=system_prompt,
-            prompt=f"Generate skill for project named '{skill_name}'. Context:\\n{context}",
-            response_model=SkillGenerationOutput
+            user_prompt=f"Generate skill for project named '{skill_name}'. Context:\\n{context}",
         )
 
         # Call provider
-        response_data = self.provider.structured_generate(request)
+        response_data = self.provider.structured_generate(request, schema=SkillGenerationOutput)
         if not isinstance(response_data, SkillGenerationOutput):
             raise TypeError("Provider did not return a SkillGenerationOutput instance.")
 

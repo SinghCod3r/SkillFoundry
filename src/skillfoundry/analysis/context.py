@@ -28,7 +28,7 @@ def select_context(analysis: ProjectAnalysis, max_chars: int = 100000) -> str:
 
     add_part("README", analysis.documentation_summary)
 
-    metadata_str = f"Name: {analysis.metadata.name}\nVersion: {analysis.metadata.version}\nDescription: {analysis.metadata.description}"
+    metadata_str = f"Name: {analysis.project_metadata.name}\nVersion: {analysis.project_metadata.version}\nDescription: {analysis.project_metadata.description}"
     add_part("Metadata", metadata_str)
 
     add_part("Directory Structure", analysis.directory_tree)

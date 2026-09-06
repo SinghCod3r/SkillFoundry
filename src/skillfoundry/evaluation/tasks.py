@@ -36,7 +36,7 @@ class TaskGenerator:
         )
 
         user_prompt = (
-            f"Project Name: {analysis.metadata.name}\n"
+            f"Project Name: {analysis.project_metadata.name}\n"
             f"Skill Name: {skill.metadata.name}\n"
             f"Skill Claims: {[claim.description for claim in skill.metadata.claims]}\n"
         )

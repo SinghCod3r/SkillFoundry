@@ -7,7 +7,6 @@ from typing import Protocol
 from pydantic import BaseModel
 
 from skillfoundry.models.evaluation import (
-    DimensionScore,
     EvaluationTask,
     EvaluationType,
     TaskResult,
@@ -16,11 +15,11 @@ from skillfoundry.providers.base import GenerateRequest, ModelProvider
 
 
 class JudgeOutput(BaseModel):
-    correctness: float
-    task_success: float
-    instruction_following: float
-    safety: float
-    efficiency: float
+    correctness: float | None = None
+    task_success: float | None = None
+    instruction_following: float | None = None
+    safety: float | None = None
+    efficiency: float | None = None
     reasoning: str
 
 
@@ -37,11 +36,8 @@ class ExactMatchJudge:
         return TaskResult(
             task_id=task.id,
             passed=success,
-            score=score,
-            dimensions=[
-                DimensionScore(dimension="correctness", score=score),
-            ],
-            reasoning="Exact match" if success else "No match",
+            scores={"correctness": score},
+            judge_reasoning="Exact match" if success else "No match",
             label="exact-match"
         )
 
@@ -53,11 +49,8 @@ class ContainsJudge:
         return TaskResult(
             task_id=task.id,
             passed=success,
-            score=score,
-            dimensions=[
-                DimensionScore(dimension="correctness", score=score),
-            ],
-            reasoning="Contains match" if success else "Does not contain",
+            scores={"correctness": score},
+            judge_reasoning="Contains match" if success else "Does not contain",
             label="contains-match"
         )
 
@@ -70,11 +63,8 @@ class RegexJudge:
         return TaskResult(
             task_id=task.id,
             passed=success,
-            score=score,
-            dimensions=[
-                DimensionScore(dimension="correctness", score=score),
-            ],
-            reasoning="Regex match" if success else "No regex match",
+            scores={"correctness": score},
+            judge_reasoning="Regex match" if success else "No regex match",
             label="regex-match"
         )
 
@@ -102,29 +92,33 @@ class LLMJudge:
             system_prompt=system_prompt,
             schema=JudgeOutput.model_json_schema()
         )
-        out_text = self.provider.generate(req)
+        out_text = self.provider.generate(req).text
         try:
             data = json.loads(out_text)
             output = JudgeOutput.model_validate(data)
         except Exception:
             raise ValueError("Failed to parse LLM Judge output.")
 
-        avg_score = (output.correctness + output.task_success + output.instruction_following + output.safety + output.efficiency) / 5.0
+        scores = {}
+        if output.correctness is not None:
+            scores["correctness"] = output.correctness
+        if output.task_success is not None:
+            scores["task_success"] = output.task_success
+        if output.instruction_following is not None:
+            scores["instruction_following"] = output.instruction_following
+        if output.safety is not None:
+            scores["safety"] = output.safety
+        if output.efficiency is not None:
+            scores["efficiency"] = output.efficiency
+
+        avg_score = sum(scores.values()) / len(scores) if scores else 0.0
         passed = avg_score >= 0.7
 
-        dimensions = [
-            DimensionScore(dimension="correctness", score=output.correctness),
-            DimensionScore(dimension="task_success", score=output.task_success),
-            DimensionScore(dimension="instruction_following", score=output.instruction_following),
-            DimensionScore(dimension="safety", score=output.safety),
-            DimensionScore(dimension="efficiency", score=output.efficiency),
-        ]
         return TaskResult(
             task_id=task.id,
             passed=passed,
-            score=avg_score,
-            dimensions=dimensions,
-            reasoning=output.reasoning,
+            scores=scores,
+            judge_reasoning=output.reasoning,
             label="model-judged"
         )
 

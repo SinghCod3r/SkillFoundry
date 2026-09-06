@@ -36,13 +36,29 @@ def discover_files(root: Path, settings: AnalysisSettings) -> list[FileInfo]:
         rel_dir = Path(dirpath).relative_to(root)
 
         # Apply excludes to directories to prevent descending
-        dirnames[:] = [d for d in dirnames if not any(fnmatch.fnmatch(str(rel_dir / d), pat) for pat in settings.exclude_patterns)]
+        # Match against patterns (handle trailing slash conventions)
+        def _match(path_str: str, is_dir: bool, pat: str) -> bool:
+            if pat.endswith("/"):
+                if not is_dir: return False
+                pat = pat[:-1]
+            # Match basename or full relative path
+            if fnmatch.fnmatch(path_str, pat) or fnmatch.fnmatch(path_str.split("/")[-1], pat):
+                return True
+            # Also support ** matching implicitly if pat doesn't contain slashes (other than trailing)
+            if "/" not in pat and fnmatch.fnmatch(path_str.split("/")[-1], pat):
+                return True
+            # If pat starts with *, it's a normal glob
+            if fnmatch.fnmatch(path_str, pat):
+                return True
+            return False
+
+        dirnames[:] = [d for d in dirnames if not any(_match(str(rel_dir / d).replace(os.sep, "/"), True, pat) for pat in settings.exclude_patterns)]
 
         for filename in filenames:
             file_path = Path(dirpath) / filename
             rel_path = file_path.relative_to(root)
 
-            if any(fnmatch.fnmatch(str(rel_path), pat) for pat in settings.exclude_patterns):
+            if any(_match(str(rel_path).replace(os.sep, "/"), False, pat) for pat in settings.exclude_patterns):
                 continue
 
             if file_count >= settings.max_files:
@@ -108,7 +124,7 @@ def discover_files(root: Path, settings: AnalysisSettings) -> list[FileInfo]:
             language = file_path.suffix.lstrip(".")
 
             info = FileInfo(
-                path=str(rel_path),
+                path=str(rel_path), relative_path=str(rel_path),
                 size=size,
                 category=category,
                 language=language,

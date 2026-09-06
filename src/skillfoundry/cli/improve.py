@@ -1,9 +1,10 @@
-"""Improve command — analyze failures and generate an improved skill."""
+"""Improve command — analyze failures, generate and evaluate an improved skill."""
 
 from __future__ import annotations
 
-import json
+import shutil
 import sys
+import tempfile
 from pathlib import Path
 
 import click
@@ -26,9 +27,10 @@ def improve(
 ) -> None:
     """Improve a skill using evaluation failures as evidence."""
     from skillfoundry.config import load_config
+    from skillfoundry.evaluation import EvaluationEngine, TaskGenerator
     from skillfoundry.improvement import SkillImprover
-    from skillfoundry.models.evaluation import EvaluationResult
     from skillfoundry.providers import get_provider
+    from skillfoundry.skills.writer import SkillWriter
 
     output: Output = ctx.obj.output
     settings = ctx.obj.settings or load_config()
@@ -40,58 +42,120 @@ def improve(
 
     output.header()
     path = Path(skill_path).resolve()
-
-    # Find evaluation results
-    output.step(1, 4, "Loading evaluation results")
-    reports_dir = Path("reports")
     skill_name = path.name
-    result_file = reports_dir / f"{skill_name}.json"
-
-    if not result_file.is_file():
-        output.error(f"No evaluation results found at {result_file}")
-        output.info("Run 'skillfoundry eval' first.")
-        sys.exit(1)
-
-    with open(result_file) as f:
-        eval_data = json.load(f)
-    eval_result = EvaluationResult.model_validate(eval_data.get("evaluation", eval_data))
-    output.success(f"Loaded evaluation (score: {eval_result.aggregate_score.overall})")
 
     # Get provider
-    output.step(2, 4, "Connecting to provider")
+    output.step(1, 6, "Connecting to provider")
     try:
         model_provider = get_provider(settings.model)
     except ValueError as e:
         output.error(str(e))
         sys.exit(1)
 
+    # Evaluate old skill
+    output.step(2, 6, "Evaluating old skill (baseline)")
+    tasks_dir = path / "evals"
+    task_gen = TaskGenerator(model_provider, settings)
+    if tasks_dir.is_dir():
+        tasks = task_gen.load_tasks(tasks_dir)
+    else:
+        output.error("No eval tasks found. Run 'skillfoundry build' first.")
+        sys.exit(1)
+
+    engine = EvaluationEngine(model_provider, settings)
+    # Using run_full_evaluation to evaluate the current skill at `path`
+    old_eval_result = engine.run_full_evaluation(path, tasks, settings.evaluation.runs)
+    output.success(f"Old skill evaluated. Score: {old_eval_result.aggregate_score.overall}")
+
     # Generate improvement
-    output.step(3, 4, "Analyzing failures and generating improvement")
+    output.step(3, 6, "Analyzing failures and generating improvement")
     improver = SkillImprover(model_provider, settings)
-    improved_skill, diff_text = improver.improve(path, eval_result)
+    improved_skill, diff_text = improver.improve(path, old_eval_result)
     output.success("Improved skill generated")
 
-    # Show diff
-    output.step(4, 4, "Changes")
     if diff_text:
+        output.info("Changes:")
         output.info(diff_text)
     else:
         output.info("No changes detected.")
 
-    # Write improved version
-    from skillfoundry.skills.writer import SkillWriter
-
+    # Write improved version to a temporary directory for evaluation
+    output.step(4, 6, "Evaluating new skill")
     writer = SkillWriter()
-    out_dir = path.parent
-    new_path = writer.write(improved_skill, out_dir)
-    output.newline()
-    output.success(f"Improved skill written to: {new_path}")
-    output.info(f"Next:\n  skillfoundry eval {new_path}")
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir_path = Path(temp_dir)
+        new_skill_path = writer.write(improved_skill, temp_dir_path)
 
-    if ctx.obj.output.json_mode:
-        output.json_output({
-            "status": "improved",
-            "original_path": str(path),
-            "improved_path": str(new_path),
-            "diff": diff_text,
-        })
+        # Copy evals so TaskGenerator/EvaluationEngine has everything if needed
+        # Or just pass tasks directly as we already have them loaded
+        new_eval_result = engine.run_full_evaluation(new_skill_path, tasks, settings.evaluation.runs)
+
+    output.success(f"New skill evaluated. Score: {new_eval_result.aggregate_score.overall}")
+
+    # Compare results
+    output.step(5, 6, "Comparing results")
+
+    old_score = old_eval_result.aggregate_score.overall
+    new_score = new_eval_result.aggregate_score.overall
+
+    old_safety = 0.0
+    for dim in old_eval_result.aggregate_score.dimensions:
+        if dim.name == "safety":
+            old_safety = dim.score
+            break
+
+    new_safety = 0.0
+    for dim in new_eval_result.aggregate_score.dimensions:
+        if dim.name == "safety":
+            new_safety = dim.score
+            break
+
+    output.info(f"Overall Score: {old_score} -> {new_score}")
+    output.info(f"Safety Score: {old_safety} -> {new_safety}")
+
+    # Decision logic
+    output.step(6, 6, "Decision")
+    rejected = False
+    reject_reason = ""
+
+    if new_safety < old_safety:
+        rejected = True
+        reject_reason = "Safety regressed."
+    elif new_score <= old_score:
+        rejected = True
+        reject_reason = "Overall score did not improve."
+
+    if rejected:
+        output.error(f"Improvement rejected: {reject_reason}")
+        output.info("Preserving the old skill.")
+
+        if ctx.obj.output.json_mode:
+            output.json_output({
+                "status": "rejected",
+                "reason": reject_reason,
+                "old_score": old_score,
+                "new_score": new_score,
+            })
+        sys.exit(1)
+    else:
+        output.success("Improvement accepted!")
+
+        # Overwrite with new skill
+        # We write to a temporary location, then move to overwrite
+        with tempfile.TemporaryDirectory() as overwrite_tmp:
+            tmp_write_path = writer.write(improved_skill, Path(overwrite_tmp))
+
+            # Remove old SKILL.md
+            (path / "SKILL.md").unlink(missing_ok=True)
+            # Copy new SKILL.md
+            shutil.copy2(tmp_write_path / "SKILL.md", path / "SKILL.md")
+
+        output.success(f"Improved skill written to: {path}")
+
+        if ctx.obj.output.json_mode:
+            output.json_output({
+                "status": "accepted",
+                "old_score": old_score,
+                "new_score": new_score,
+                "diff": diff_text,
+            })

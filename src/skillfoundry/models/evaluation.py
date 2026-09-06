@@ -68,24 +68,45 @@ class ScoringWeights(BaseModel):
         )
         return abs(total - 1.0) < 0.01
 
+    def normalize(self) -> None:
+        total = (
+            self.correctness
+            + self.task_success
+            + self.instruction_following
+            + self.safety
+            + self.efficiency
+        )
+        if total > 0:
+            self.correctness /= total
+            self.task_success /= total
+            self.instruction_following /= total
+            self.safety /= total
+            self.efficiency /= total
+
 
 class DimensionScore(BaseModel):
     """Score for a single evaluation dimension."""
 
     name: str
     score: float = Field(ge=0.0, le=1.0)
-    weight: float = Field(ge=0.0, le=1.0)
+    weight: float = Field(ge=0.0, le=1.0, default=1.0)
     label: str = "observed"  # "observed", "estimated", "model-judged"
 
 
 class Score(BaseModel):
     """Aggregate score across all evaluation dimensions."""
 
-    overall: int = Field(ge=0, le=100)
+    overall: float = Field(ge=0.0, le=100.0)
     dimensions: list[DimensionScore] = Field(default_factory=list)
     task_count: int = 0
     passed: int = 0
     failed: int = 0
+    mean: float = 0.0
+    min: float = 0.0
+    max: float = 0.0
+    variance: float = 0.0
+    num_runs: int = 1
+    single_run_warning: bool = False
 
     @property
     def pass_rate(self) -> float:
@@ -105,6 +126,7 @@ class EvaluationRun(BaseModel):
     task_results: list[TaskResult] = Field(default_factory=list)
     score: Score = Field(default_factory=Score)
     errors: list[str] = Field(default_factory=list)
+    latency: float = 0.0
 
 
 class EvaluationResult(BaseModel):
@@ -116,7 +138,9 @@ class EvaluationResult(BaseModel):
     evaluation_version: str = "1.0"
     config_hash: str = ""
     runs: list[EvaluationRun] = Field(default_factory=list)
+    baseline_runs: list[EvaluationRun] = Field(default_factory=list)
     aggregate_score: Score = Field(default_factory=Score)
+    baseline_score: Score | None = None
     mean_scores: dict[str, float] = Field(default_factory=dict)
     score_range: dict[str, tuple[float, float]] = Field(default_factory=dict)
 

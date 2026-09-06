@@ -21,7 +21,7 @@ class SkillWriter:
         Write the skill to the output directory.
         Creates a subdirectory named after the skill.
         """
-        validate_path(output_dir)
+        validate_path(output_dir, output_dir)
 
         skill_dir = safe_join(output_dir, skill.metadata.name)
         if skill_dir.exists():
@@ -33,7 +33,7 @@ class SkillWriter:
         # SKILL.md
         skill_md_path = safe_join(skill_dir, "SKILL.md")
         frontmatter = self.format_frontmatter(skill.metadata)
-        content = f"{frontmatter}\\n\\n{skill.body}"
+        content = f"{frontmatter}\n\n{skill.skill_md_body}"
         skill_md_path.write_text(content, encoding="utf-8")
 
         # References
@@ -77,4 +77,4 @@ class SkillWriter:
             data["allowed-tools"] = metadata.allowed_tools
 
         yaml_str = yaml.dump(data, default_flow_style=False, sort_keys=False)
-        return f"---\\n{yaml_str}---"
+        return f"---\n{yaml_str}---"

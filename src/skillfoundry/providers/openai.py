@@ -10,7 +10,6 @@ from skillfoundry.providers.base import (
     GenerateRequest,
     GenerateResponse,
     ModelCapability,
-    ModelProvider,
     validate_and_parse,
 )
 

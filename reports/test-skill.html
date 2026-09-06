@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SkillFoundry Report - {{ report.skill_name }}</title>
+    <title>SkillFoundry Report - test-skill</title>
     <style>
         :root {
             --bg: #ffffff;
@@ -183,21 +183,21 @@
 </head>
 <body>
     <div class="header">
-        <h1>SkillFoundry Report: {{ report.skill_name }}</h1>
+        <h1>SkillFoundry Report: test-skill</h1>
         <div class="header-meta">
-            <span>Source: {{ report.source_path }}</span>
-            <span>Date: {{ report.metadata.timestamp }}</span>
-            <span>Version: {{ report.metadata.version }}</span>
+            <span>Source: /home/ayushcod3r/project_works/SkillFoundry/dist/test-skill</span>
+            <span>Date: 2026-09-06 06:22:26.295932+00:00</span>
+            <span>Version: </span>
         </div>
     </div>
 
-    {% if report.evaluation %}
+    
     <div class="card">
         <h2>Overall Score</h2>
         <div class="score-container">
-            {% set s = report.evaluation.aggregate_score.overall %}
-            <span class="score-large {% if s >= 80 %}score-green{% elif s >= 60 %}score-yellow{% else %}score-red{% endif %}">
-                {{ "%.1f"|format(s) }}
+            
+            <span class="score-large score-red">
+                0.0
             </span>
             <span>/ 100</span>
         </div>
@@ -205,86 +205,35 @@
 
     <h3>Dimensions</h3>
     <div class="grid">
-        {% for dim in report.evaluation.aggregate_score.dimensions %}
-        <div class="score-card">
-            <div class="label">{{ dim.name }}</div>
-            <div class="value {% if dim.score >= 80 %}score-green{% elif dim.score >= 60 %}score-yellow{% else %}score-red{% endif %}">
-                {{ "%.1f"|format(dim.score) }}
-            </div>
-        </div>
-        {% endfor %}
+        
     </div>
 
-    {% if report.evaluation.task_results %}
-    <h3>Task Results</h3>
-    <div>
-        {% for task in report.evaluation.task_results %}
-        <details class="{% if task.success %}task-success{% else %}task-failure{% endif %}">
-            <summary>{{ task.task.name }} - {% if task.success %}Pass{% else %}Fail{% endif %}</summary>
-            <div>
-                <p><strong>Description:</strong> {{ task.task.description }}</p>
-                {% if task.output %}
-                <p><strong>Output:</strong></p>
-                <pre>{{ task.output }}</pre>
-                {% endif %}
-                {% if task.error %}
-                <p><strong>Error:</strong></p>
-                <pre>{{ task.error }}</pre>
-                {% endif %}
-            </div>
-        </details>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endif %}
+    
+    
 
-    {% if report.comparison %}
-    <h3>Comparison</h3>
-    <div class="card">
-        <p><strong>Baseline Score:</strong> {{ "%.1f"|format(report.comparison.baseline_score) }}</p>
-        <p><strong>Improvement:</strong> {{ "%.1f"|format(report.comparison.improvement) }}</p>
-    </div>
-    {% endif %}
+    
 
-    {% if report.warnings %}
-    <h3>Warnings</h3>
-    <div class="card" style="border-left: 4px solid var(--score-yellow);">
-        <ul style="margin: 0; padding-left: 1.5rem;">
-            {% for warning in report.warnings %}
-            <li>{{ warning }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+    
 
-    {% if report.recommendations %}
-    <h3>Recommendations</h3>
-    <div class="card">
-        <ul style="margin: 0; padding-left: 1.5rem;">
-            {% for rec in report.recommendations %}
-            <li>{{ rec }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
+    
 
-    {% if report.generated_files %}
+    
     <h3>Generated Files</h3>
     <div class="card">
         <ul class="list-unstyled" style="margin: 0;">
-            {% for file in report.generated_files %}
-            <li><code>{{ file }}</code></li>
-            {% endfor %}
+            
+            <li><code>SKILL.md</code></li>
+            
         </ul>
     </div>
-    {% endif %}
+    
 
     <h3>Metadata</h3>
     <div class="card">
         <ul class="list-unstyled" style="margin: 0;">
-            <li><strong>Model:</strong> {{ report.metadata.model_name }}</li>
-                        <li><strong>System Hash:</strong> <code>{{ report.metadata.system_hash }}</code></li>
-            <li><strong>Environment:</strong> {{ report.metadata.environment }}</li>
+            <li><strong>Model:</strong> </li>
+                        <li><strong>System Hash:</strong> <code></code></li>
+            <li><strong>Environment:</strong> </li>
         </ul>
     </div>
 </body>

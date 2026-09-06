@@ -16,10 +16,10 @@ logger = logging.getLogger(__name__)
 
 def generate_skill_name(analysis: ProjectAnalysis) -> str:
     """
-    Generate a skill name from project analysis metadata.
+    Generate a skill name from project analysis.project_metadata.
     Uses project name if available, otherwise falls back to directory name.
     """
-    raw_name = analysis.metadata.name if analysis.metadata and analysis.metadata.name else analysis.metadata.directory_name
+    raw_name = analysis.project_metadata.name if analysis.project_metadata and analysis.project_metadata.name else analysis.project_metadata.directory_name
     normalized_name = normalize_skill_name(raw_name)
 
     if raw_name != normalized_name:

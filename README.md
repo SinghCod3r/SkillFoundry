@@ -90,7 +90,7 @@ SkillFoundry generates a diverse set of tasks that an AI agent might need to per
 - Secrets are detected and redacted before model submission
 - Generated commands are never auto-executed
 - Path traversal and SSRF protections are enforced
-- Evaluation runs in isolated environments
+- V0.1 does not execute arbitrary repository code or generated scripts. Execution is strictly limited to evaluating test runners and framework wrappers on isolated tasks, not the source code being analyzed.
 
 ## Supported Providers
 
@@ -112,7 +112,7 @@ Auto-detection: if no provider is configured, SkillFoundry checks for API key en
 ## Development
 
 ```bash
-git clone https://github.com/skillfoundry/skillfoundry.git
+git clone https://github.com/SinghCod3r/SkillFoundry.git
 cd skillfoundry
 pip install -e ".[dev,all-providers]"
 pytest
